@@ -105,6 +105,88 @@ Emitter.prototype.emit = function(event){
 ;(function(exports, html){
 
 /**
+ * Expose `Overlay`.
+ */
+
+exports.Overlay = Overlay;
+
+/**
+ * Return a new `Overlay` with the given `options`.
+ *
+ * @param {Object} options
+ * @return {Overlay}
+ * @api public
+ */
+
+exports.overlay = function(options){
+  return new Overlay(options);
+};
+
+/**
+ * Initialize a new `Overlay`.
+ *
+ * @param {Object} options
+ * @api public
+ */
+
+function Overlay(options) {
+  ui.Emitter.call(this);
+  var self = this;
+  options = options || {};
+  this.closable = options.closable;
+  this.el = $(html);
+  this.el.appendTo('body');
+  if (this.closable) {
+    this.el.click(function(){
+      self.hide();
+    });
+  }
+}
+
+/**
+ * Inherit from `Emitter.prototype`.
+ */
+
+Overlay.prototype = new ui.Emitter;
+
+/**
+ * Show the overlay.
+ *
+ * Emits "show" event.
+ *
+ * @return {Overlay} for chaining
+ * @api public
+ */
+
+Overlay.prototype.show = function(){
+  this.emit('show');
+  this.el.removeClass('hide');
+  return this;
+};
+
+/**
+ * Hide the overlay.
+ *
+ * Emits "hide" event.
+ *
+ * @return {Overlay} for chaining
+ * @api public
+ */
+
+Overlay.prototype.hide = function(){
+  var self = this;
+  this.emit('hide');
+  this.el.addClass('hide');
+  setTimeout(function(){
+    self.el.remove();
+  }, 2000);
+  return this;
+};
+
+})(ui, "<div id=\"overlay\" class=\"hide\"></div>");
+;(function(exports, html){
+
+/**
  * Active dialog.
  */
 
@@ -330,9 +412,9 @@ Dialog.prototype.hide = function(ms){
   // hide / remove
   this.el.addClass('hide');
   if (this._effect) {
-    setTimeout(function(self){
+    setTimeout(function(){
       self.remove();
-    }, 500, this);
+    }, 500);
   } else {
     self.remove();
   }
@@ -356,89 +438,7 @@ Dialog.prototype.remove = function(){
   return this;
 };
 
-})(ui, "<div id=\"dialog\" class=\"hide\">\n  <div class=\"content\">\n    <h1>Title</h1>\n    <a href=\"#\" class=\"close\">×</a>\n    <p>Message</p>\n  </div>\n</div>");
-;(function(exports, html){
-
-/**
- * Expose `Overlay`.
- */
-
-exports.Overlay = Overlay;
-
-/**
- * Return a new `Overlay` with the given `options`.
- *
- * @param {Object} options
- * @return {Overlay}
- * @api public
- */
-
-exports.overlay = function(options){
-  return new Overlay(options);
-};
-
-/**
- * Initialize a new `Overlay`.
- *
- * @param {Object} options
- * @api public
- */
-
-function Overlay(options) {
-  ui.Emitter.call(this);
-  var self = this;
-  options = options || {};
-  this.closable = options.closable;
-  this.el = $(html);
-  this.el.appendTo('body');
-  if (this.closable) {
-    this.el.click(function(){
-      self.hide();
-    });
-  }
-}
-
-/**
- * Inherit from `Emitter.prototype`.
- */
-
-Overlay.prototype = new ui.Emitter;
-
-/**
- * Show the overlay.
- *
- * Emits "show" event.
- *
- * @return {Overlay} for chaining
- * @api public
- */
-
-Overlay.prototype.show = function(){
-  this.emit('show');
-  this.el.removeClass('hide');
-  return this;
-};
-
-/**
- * Hide the overlay.
- *
- * Emits "hide" event.
- *
- * @return {Overlay} for chaining
- * @api public
- */
-
-Overlay.prototype.hide = function(){
-  var self = this;
-  this.emit('hide');
-  this.el.addClass('hide');
-  setTimeout(function(){
-    self.el.remove();
-  }, 2000);
-  return this;
-};
-
-})(ui, "<div id=\"overlay\" class=\"hide\"></div>");
+})(ui, "<div id=\"dialog\" class=\"hide\">\r\n  <div class=\"content\">\r\n    <h1>Title</h1>\r\n    <a href=\"#\" class=\"close\">×</a>\r\n    <p>Message</p>\r\n  </div>\r\n</div>");
 ;(function(exports, html){
 
 /**
@@ -574,148 +574,7 @@ Confirmation.prototype.render = function(options){
   });
 };
 
-})(ui, "<div class=\"actions\">\n  <button class=\"cancel\">Cancel</button>\n  <button class=\"ok main\">Ok</button>\n</div>");
-;(function(exports, html){
-
-/**
- * Expose `Alert`.
- */
-
-exports.Alert = Alert;
-
-/**
- * Return a new `Alert` dialog with the given
- * `title` and `msg`.
- *
- * @param {String} title or msg
- * @param {String} msg
- * @return {Dialog}
- * @api public
- */
-
-exports.alert = function(title, msg){
-  switch (arguments.length) {
-    case 2:
-      return new Alert({ title: title, message: msg });
-    case 1:
-      return new Alert({ message: title });
-  }
-};
-
-/**
- * Initialize a new `Alert` dialog.
- *
- * Options:
- *
- *    - `title` dialog title
- *    - `message` a message to display
- *
- * Emits:
- *
- *    - `cancel` the user pressed cancel or closed the dialog
- *    - `ok` the user clicked ok
- *    - `show` when visible
- *    - `hide` when hidden
- *
- * @param {Object} options
- * @api public
- */
-
-function Alert(options) {
-  ui.Dialog.call(this, options);
-};
-
-/**
- * Inherit from `Dialog.prototype`.
- */
-
-Alert.prototype = new ui.Dialog;
-
-/**
- * Change "cancel" button `text`.
- *
- * @param {String} text
- * @return {Alert}
- * @api public
- */
-
-Alert.prototype.cancel = function(text){
-  var cancel = this.el.find('.cancel');
-  cancel.text(text);
-  cancel.removeClass('hide');
-  return this;
-};
-
-/**
- * Change "ok" button `text`.
- *
- * @param {String} text
- * @return {Alert}
- * @api public
- */
-
-Alert.prototype.ok = function(text){
-  var ok = this.el.find('.ok');
-  ok.text(text);
-  ok.removeClass('hide');
-  return this;
-};
-
-/**
- * Show the confirmation dialog and invoke `fn(ok)`.
- *
- * @param {Function} fn
- * @return {Alert} for chaining
- * @api public
- */
-
-Alert.prototype.show = function(fn){
-  ui.Dialog.prototype.show.call(this);
-  this.el.find('.ok').focus();
-  this.callback = fn || function(){};
-  return this;
-};
-
-/**
- * Render with the given `options`.
- *
- * Emits "cancel" event.
- * Emits "ok" event.
- *
- * @param {Object} options
- * @api public
- */
-
-Alert.prototype.render = function(options){
-  ui.Dialog.prototype.render.call(this, options);
-  var self = this
-    , actions = $(html);
-
-  this.el.addClass('alert');
-  this.el.append(actions);
-
-  this.on('close', function(){
-    self.emit('cancel');
-    self.callback(false);
-  });
-
-  actions.find('.cancel').click(function(e){
-    e.preventDefault();
-    self.emit('cancel');
-    self.callback(false);
-    self.hide();
-  });
-
-  actions.find('.ok').click(function(e){
-    e.preventDefault();
-    self.emit('ok');
-    self.callback(true);
-    self.hide();
-  });
-
-};
-
-})(ui, "<div class=\"actions\">\n  <button class=\"cancel hide\">Cancel</button>\n  <button class=\"ok main hide\">Ok</button>\n</div>");
+})(ui, "<div class=\"actions\">\r\n  <button class=\"cancel\">Cancel</button>\r\n  <button class=\"ok main\">Ok</button>\r\n</div>");
 ;(function(exports, html){
 
 /**
@@ -1068,31 +927,18 @@ ColorPicker.prototype.renderMain = function(options){
   ctx.beginPath();
   ctx.restore();
 };
-})(ui, "<div class=\"color-picker\">\n  <canvas class=\"main\"></canvas>\n  <canvas class=\"spectrum\"></canvas>\n</div>");
+})(ui, "<div class=\"color-picker\">\r\n  <canvas class=\"main\"></canvas>\r\n  <canvas class=\"spectrum\"></canvas>\r\n</div>");
 ;(function(exports, html){
 
 /**
- * Notification list.
+ * Expose `Alert`.
  */
 
-var list;
+exports.Alert = Alert;
 
 /**
- * Expose `Notification`.
- */
-
-exports.Notification = Notification;
-
-// list
-
-$(function(){
-  list = $('<ul id="notifications">');
-  list.appendTo('body');
-})
-
-/**
- * Return a new `Notification` with the given 
- * (optional) `title` and `msg`.
+ * Return a new `Alert` dialog with the given
+ * `title` and `msg`.
  *
  * @param {String} title or msg
  * @param {String} msg
@@ -1100,328 +946,129 @@ $(function(){
  * @api public
  */
 
-exports.notify = function(title, msg){
+exports.alert = function(title, msg){
   switch (arguments.length) {
     case 2:
-      return new Notification({ title: title, message: msg })
-        .show()
-        .hide(4000);
+      return new Alert({ title: title, message: msg });
     case 1:
-      return new Notification({ message: title })
-        .show()
-        .hide(4000);
+      return new Alert({ message: title });
   }
 };
 
 /**
- * Construct a notification function for `type`.
- *
- * @param {String} type
- * @return {Function}
- * @api private
- */
-
-function type(type) {
-  return function(title, msg){
-    return exports.notify.apply(this, arguments)
-      .type(type);
-  }
-}
-
-/**
- * Notification methods.
- */
-
-exports.info = exports.notify;
-exports.warn = type('warn');
-exports.error = type('error');
-
-/**
- * Initialize a new `Notification`.
+ * Initialize a new `Alert` dialog.
  *
  * Options:
  *
  *    - `title` dialog title
  *    - `message` a message to display
  *
+ * Emits:
+ *
+ *    - `cancel` the user pressed cancel or closed the dialog
+ *    - `ok` the user clicked ok
+ *    - `show` when visible
+ *    - `hide` when hidden
+ *
  * @param {Object} options
  * @api public
  */
 
-function Notification(options) {
-  ui.Emitter.call(this);
-  options = options || {};
-  this.template = html;
-  this.el = $(this.template);
-  this.render(options);
-  if (Notification.effect) this.effect(Notification.effect);
+function Alert(options) {
+  ui.Dialog.call(this, options);
 };
 
 /**
- * Inherit from `Emitter.prototype`.
+ * Inherit from `Dialog.prototype`.
  */
 
-Notification.prototype = new ui.Emitter;
+Alert.prototype = new ui.Dialog;
+
+/**
+ * Change "cancel" button `text`.
+ *
+ * @param {String} text
+ * @return {Alert}
+ * @api public
+ */
+
+Alert.prototype.cancel = function(text){
+  var cancel = this.el.find('.cancel');
+  cancel.text(text);
+  cancel.removeClass('hide');
+  return this;
+};
+
+/**
+ * Change "ok" button `text`.
+ *
+ * @param {String} text
+ * @return {Alert}
+ * @api public
+ */
+
+Alert.prototype.ok = function(text){
+  var ok = this.el.find('.ok');
+  ok.text(text);
+  ok.removeClass('hide');
+  return this;
+};
+
+/**
+ * Show the confirmation dialog and invoke `fn(ok)`.
+ *
+ * @param {Function} fn
+ * @return {Alert} for chaining
+ * @api public
+ */
+
+Alert.prototype.show = function(fn){
+  ui.Dialog.prototype.show.call(this);
+  this.el.find('.ok').focus();
+  this.callback = fn || function(){};
+  return this;
+};
 
 /**
  * Render with the given `options`.
  *
+ * Emits "cancel" event.
+ * Emits "ok" event.
+ *
  * @param {Object} options
  * @api public
  */
 
-Notification.prototype.render = function(options){
-  var el = this.el
-    , title = options.title
-    , msg = options.message
-    , self = this;
-
-  el.find('.close').click(function(){
-    self.hide();
-    return false;
-  });
-
-  el.click(function(e){
-    e.preventDefault();
-    self.emit('click', e);
-  });
-
-  el.find('h1').text(title);
-  if (!title) el.find('h1').remove();
-
-  // message
-  if ('string' == typeof msg) {
-    el.find('p').text(msg);
-  } else if (msg) {
-    el.find('p').replaceWith(msg.el || msg);
-  }
-
-  setTimeout(function(){
-    el.removeClass('hide');
-  }, 0);
-};
-
-/**
- * Enable the dialog close link.
- *
- * @return {Notification} for chaining
- * @api public
- */
-
-Notification.prototype.closable = function(){
-  this.el.addClass('closable');
-  return this;
-};
-
-/**
- * Set the effect to `type`.
- *
- * @param {String} type
- * @return {Notification} for chaining
- * @api public
- */
-
-Notification.prototype.effect = function(type){
-  this._effect = type;
-  this.el.addClass(type);
-  return this;
-};
-
-/**
- * Show the notification.
- *
- * @return {Notification} for chaining
- * @api public
- */
-
-Notification.prototype.show = function(){
-  this.el.appendTo(list);
-  return this;
-};
-
-/**
- * Set the notification `type`.
- *
- * @param {String} type
- * @return {Notification} for chaining
- * @api public
- */
-
-Notification.prototype.type = function(type){
-  this._type = type;
-  this.el.addClass(type);
-  return this;
-};
-
-/**
- * Make it stick (clear hide timer), and make it closable.
- *
- * @return {Notification} for chaining
- * @api public
- */
-
-Notification.prototype.sticky = function(){
-  return this.hide(0).closable();
-};
-
-/**
- * Hide the dialog with optional delay of `ms`,
- * otherwise the notification is removed immediately.
- *
- * @return {Number} ms
- * @return {Notification} for chaining
- * @api public
- */
-
-Notification.prototype.hide = function(ms){
-  var self = this;
-
-  // duration
-  if ('number' == typeof ms) {
-    clearTimeout(this.timer);
-    if (!ms) return this;
-    this.timer = setTimeout(function(){
-      self.hide();
-    }, ms);
-    return this;
-  }
-
-  // hide / remove
-  this.el.addClass('hide');
-  if (this._effect) {
-    setTimeout(function(self){
-      self.remove();
-    }, 500, this);
-  } else {
-    self.remove();
-  }
-
-  return this;
-};
-
-/**
- * Hide the notification without potential animation.
- *
- * @return {Dialog} for chaining
- * @api public
- */
-
-Notification.prototype.remove = function(){
-  this.el.remove();
-  return this;
-};
-})(ui, "<li class=\"notification hide\">\n  <div class=\"content\">\n    <h1>Title</h1>\n    <a href=\"#\" class=\"close\">×</a>\n    <p>Message</p>\n  </div>\n</li>");
-;(function(exports, html){
-
-/**
- * Expose `SplitButton`.
- */
-
-exports.SplitButton = SplitButton;
-
-/**
- * Initialize a new `SplitButton`
- * with an optional `label`.
- *
- * @param {String} label
- * @api public
- */
-
-function SplitButton(label) {
-  ui.Emitter.call(this);
-  this.el = $(html);
-  this.events();
-  this.render({ label: label });
-  this.state = 'hidden';
-}
-
-/**
- * Inherit from `Emitter.prototype`.
- */
-
-SplitButton.prototype = new ui.Emitter;
-
-/**
- * Register event handlers.
- *
- * @api private
- */
-
-SplitButton.prototype.events = function(){
+Alert.prototype.render = function(options){
+  ui.Dialog.prototype.render.call(this, options);
   var self = this
-    , el = this.el;
+    , actions = $(html);
 
-  el.find('.button').click(function(e){
-    e.preventDefault();
-    self.emit('click', e);
+  this.el.addClass('alert');
+  this.el.append(actions);
+
+  this.on('close', function(){
+    self.emit('cancel');
+    self.callback(false);
   });
 
-  el.find('.toggle').click(function(e){
+  actions.find('.cancel').click(function(e){
     e.preventDefault();
-    self.toggle();
+    self.emit('cancel');
+    self.callback(false);
+    self.hide();
   });
+
+  actions.find('.ok').click(function(e){
+    e.preventDefault();
+    self.emit('ok');
+    self.callback(true);
+    self.hide();
+  });
+
 };
 
-/**
- * Toggle the drop-down contents.
- *
- * @return {SplitButton}
- * @api public
- */
-
-SplitButton.prototype.toggle = function(){
-  return 'hidden' == this.state
-    ? this.show()
-    : this.hide();
-};
-
-/**
- * Show the drop-down contents.
- *
- * @return {SplitButton}
- * @api public
- */
-
-SplitButton.prototype.show = function(){
-  this.state = 'visible';
-  this.emit('show');
-  this.el.addClass('show');
-  return this;
-};
-
-/**
- * Hide the drop-down contents.
- *
- * @return {SplitButton}
- * @api public
- */
-
-SplitButton.prototype.hide = function(){
-  this.state = 'hidden';
-  this.emit('hide');
-  this.el.removeClass('show');
-  return this;
-};
-
-/**
- * Render the split-button with the given `options`.
- *
- * @param {Object} options
- * @return {SplitButton}
- * @api private
- */
-
-SplitButton.prototype.render = function(options){
-  var options = options || {}
-    , button = this.el.find('.button')
-    , label = options.label;
-
-  if ('string' == label) button.text(label);
-  else button.text('').append(label);
-  return this;
-};
-
-})(ui, "<div class=\"split-button\">\n  <a class=\"button\" href=\"#\">Action</a>\n  <a class=\"toggle\" href=\"#\"><span></span></a>\n</div>");
+})(ui, "<div class=\"actions\">\r\n  <button class=\"cancel hide\">Cancel</button>\r\n  <button class=\"ok main hide\">Ok</button>\r\n</div>");
 ;(function(exports, html){
 
 /**
@@ -1438,7 +1085,7 @@ exports.Menu = Menu;
  */
 
 exports.menu = function(){
-  return new Menu();
+  return new Menu;
 };
 
 /**
@@ -1662,7 +1309,360 @@ function slug(str) {
     .replace(/[^a-z0-9-]/g, '');
 }
 
-})(ui, "<div class=\"menu\">\n</div>");
+})(ui, "<div class=\"menu\">\r\n</div>");
+;(function(exports, html){
+
+/**
+ * Notification list.
+ */
+
+var list;
+
+/**
+ * Expose `Notification`.
+ */
+
+exports.Notification = Notification;
+
+// list
+
+$(function(){
+  list = $('<ul id="notifications">');
+  list.appendTo('body');
+})
+
+/**
+ * Return a new `Notification` with the given 
+ * (optional) `title` and `msg`.
+ *
+ * @param {String} title or msg
+ * @param {String} msg
+ * @return {Dialog}
+ * @api public
+ */
+
+exports.notify = function(title, msg){
+  switch (arguments.length) {
+    case 2:
+      return new Notification({ title: title, message: msg })
+        .show()
+        .hide(4000);
+    case 1:
+      return new Notification({ message: title })
+        .show()
+        .hide(4000);
+  }
+};
+
+/**
+ * Construct a notification function for `type`.
+ *
+ * @param {String} type
+ * @return {Function}
+ * @api private
+ */
+
+function type(type) {
+  return function(title, msg){
+    return exports.notify.apply(this, arguments)
+      .type(type);
+  }
+}
+
+/**
+ * Notification methods.
+ */
+
+exports.info = exports.notify;
+exports.warn = type('warn');
+exports.error = type('error');
+
+/**
+ * Initialize a new `Notification`.
+ *
+ * Options:
+ *
+ *    - `title` dialog title
+ *    - `message` a message to display
+ *
+ * @param {Object} options
+ * @api public
+ */
+
+function Notification(options) {
+  ui.Emitter.call(this);
+  options = options || {};
+  this.template = html;
+  this.el = $(this.template);
+  this.render(options);
+  if (Notification.effect) this.effect(Notification.effect);
+};
+
+/**
+ * Inherit from `Emitter.prototype`.
+ */
+
+Notification.prototype = new ui.Emitter;
+
+/**
+ * Render with the given `options`.
+ *
+ * @param {Object} options
+ * @api public
+ */
+
+Notification.prototype.render = function(options){
+  var el = this.el
+    , title = options.title
+    , msg = options.message
+    , self = this;
+
+  el.find('.close').click(function(){
+    self.hide();
+    return false;
+  });
+
+  el.click(function(e){
+    e.preventDefault();
+    self.emit('click', e);
+  });
+
+  el.find('h1').text(title);
+  if (!title) el.find('h1').remove();
+
+  // message
+  if ('string' == typeof msg) {
+    el.find('p').text(msg);
+  } else if (msg) {
+    el.find('p').replaceWith(msg.el || msg);
+  }
+
+  setTimeout(function(){
+    el.removeClass('hide');
+  }, 0);
+};
+
+/**
+ * Enable the dialog close link.
+ *
+ * @return {Notification} for chaining
+ * @api public
+ */
+
+Notification.prototype.closable = function(){
+  this.el.addClass('closable');
+  return this;
+};
+
+/**
+ * Set the effect to `type`.
+ *
+ * @param {String} type
+ * @return {Notification} for chaining
+ * @api public
+ */
+
+Notification.prototype.effect = function(type){
+  this._effect = type;
+  this.el.addClass(type);
+  return this;
+};
+
+/**
+ * Show the notification.
+ *
+ * @return {Notification} for chaining
+ * @api public
+ */
+
+Notification.prototype.show = function(){
+  this.el.appendTo(list);
+  return this;
+};
+
+/**
+ * Set the notification `type`.
+ *
+ * @param {String} type
+ * @return {Notification} for chaining
+ * @api public
+ */
+
+Notification.prototype.type = function(type){
+  this._type = type;
+  this.el.addClass(type);
+  return this;
+};
+
+/**
+ * Make it stick (clear hide timer), and make it closable.
+ *
+ * @return {Notification} for chaining
+ * @api public
+ */
+
+Notification.prototype.sticky = function(){
+  return this.hide(0).closable();
+};
+
+/**
+ * Hide the dialog with optional delay of `ms`,
+ * otherwise the notification is removed immediately.
+ *
+ * @return {Number} ms
+ * @return {Notification} for chaining
+ * @api public
+ */
+
+Notification.prototype.hide = function(ms){
+  var self = this;
+
+  // duration
+  if ('number' == typeof ms) {
+    clearTimeout(this.timer);
+    if (!ms) return this;
+    this.timer = setTimeout(function(){
+      self.hide();
+    }, ms);
+    return this;
+  }
+
+  // hide / remove
+  this.el.addClass('hide');
+  if (this._effect) {
+    setTimeout(function(){
+      self.remove();
+    }, 500);
+  } else {
+    self.remove();
+  }
+
+  return this;
+};
+
+/**
+ * Hide the notification without potential animation.
+ *
+ * @return {Dialog} for chaining
+ * @api public
+ */
+
+Notification.prototype.remove = function(){
+  this.el.remove();
+  return this;
+};
+})(ui, "<li class=\"notification hide\">\r\n  <div class=\"content\">\r\n    <h1>Title</h1>\r\n    <a href=\"#\" class=\"close\">×</a>\r\n    <p>Message</p>\r\n  </div>\r\n</li>");
+;(function(exports, html){
+
+/**
+ * Expose `SplitButton`.
+ */
+
+exports.SplitButton = SplitButton;
+
+/**
+ * Initialize a new `SplitButton`
+ * with an optional `label`.
+ *
+ * @param {String} label
+ * @api public
+ */
+
+function SplitButton(label) {
+  ui.Emitter.call(this);
+  this.el = $(html);
+  this.events();
+  this.render({ label: label });
+  this.state = 'hidden';
+}
+
+/**
+ * Inherit from `Emitter.prototype`.
+ */
+
+SplitButton.prototype = new ui.Emitter;
+
+/**
+ * Register event handlers.
+ *
+ * @api private
+ */
+
+SplitButton.prototype.events = function(){
+  var self = this
+    , el = this.el;
+
+  el.find('.button').click(function(e){
+    e.preventDefault();
+    self.emit('click', e);
+  });
+
+  el.find('.toggle').click(function(e){
+    e.preventDefault();
+    self.toggle();
+  });
+};
+
+/**
+ * Toggle the drop-down contents.
+ *
+ * @return {SplitButton}
+ * @api public
+ */
+
+SplitButton.prototype.toggle = function(){
+  return 'hidden' == this.state
+    ? this.show()
+    : this.hide();
+};
+
+/**
+ * Show the drop-down contents.
+ *
+ * @return {SplitButton}
+ * @api public
+ */
+
+SplitButton.prototype.show = function(){
+  this.state = 'visible';
+  this.emit('show');
+  this.el.addClass('show');
+  return this;
+};
+
+/**
+ * Hide the drop-down contents.
+ *
+ * @return {SplitButton}
+ * @api public
+ */
+
+SplitButton.prototype.hide = function(){
+  this.state = 'hidden';
+  this.emit('hide');
+  this.el.removeClass('show');
+  return this;
+};
+
+/**
+ * Render the split-button with the given `options`.
+ *
+ * @param {Object} options
+ * @return {SplitButton}
+ * @api private
+ */
+
+SplitButton.prototype.render = function(options){
+  var options = options || {}
+    , button = this.el.find('.button')
+    , label = options.label;
+
+  if ('string' == label) button.text(label);
+  else button.text('').append(label);
+  return this;
+};
+
+})(ui, "<div class=\"split-button\">\r\n  <a class=\"button\" href=\"#\">Action</a>\r\n  <a class=\"toggle\" href=\"#\"><span></span></a>\r\n</div>");
 ;(function(exports, html){
 
 /**
@@ -1779,4 +1779,4 @@ Card.prototype.render = function(options){
     self.flip();
   });
 };
-})(ui, "<div class=\"card\">\n  <div class=\"wrapper\">\n    <div class=\"face front\">1</div>\n    <div class=\"face back\">2</div>\n  </div>\n</div>");
+})(ui, "<div class=\"card\">\r\n  <div class=\"wrapper\">\r\n    <div class=\"face front\">1</div>\r\n    <div class=\"face back\">2</div>\r\n  </div>\r\n</div>");
