@@ -581,6 +581,147 @@ Confirmation.prototype.render = function(options){
 ;(function(exports, html){
 
 /**
+ * Expose `Alert`.
+ */
+
+exports.Alert = Alert;
+
+/**
+ * Return a new `Alert` dialog with the given
+ * `title` and `msg`.
+ *
+ * @param {String} title or msg
+ * @param {String} msg
+ * @return {Dialog}
+ * @api public
+ */
+
+exports.alert = function(title, msg){
+  switch (arguments.length) {
+    case 2:
+      return new Alert({ title: title, message: msg });
+    case 1:
+      return new Alert({ message: title });
+  }
+};
+
+/**
+ * Initialize a new `Alert` dialog.
+ *
+ * Options:
+ *
+ *    - `title` dialog title
+ *    - `message` a message to display
+ *
+ * Emits:
+ *
+ *    - `cancel` the user pressed cancel or closed the dialog
+ *    - `ok` the user clicked ok
+ *    - `show` when visible
+ *    - `hide` when hidden
+ *
+ * @param {Object} options
+ * @api public
+ */
+
+function Alert(options) {
+  ui.Dialog.call(this, options);
+}
+
+/**
+ * Inherit from `Dialog.prototype`.
+ */
+
+Alert.prototype = new ui.Dialog();
+
+/**
+ * Change "cancel" button `text`.
+ *
+ * @param {String} text
+ * @return {Alert}
+ * @api public
+ */
+
+Alert.prototype.cancel = function(text){
+  var cancel = this.el.find('.cancel');
+  cancel.text(text);
+  cancel.removeClass('hide');
+  return this;
+};
+
+/**
+ * Change "ok" button `text`.
+ *
+ * @param {String} text
+ * @return {Alert}
+ * @api public
+ */
+
+Alert.prototype.ok = function(text){
+  var ok = this.el.find('.ok');
+  ok.text(text);
+  ok.removeClass('hide');
+  return this;
+};
+
+/**
+ * Show the confirmation dialog and invoke `fn(ok)`.
+ *
+ * @param {Function} fn
+ * @return {Alert} for chaining
+ * @api public
+ */
+
+Alert.prototype.show = function(fn){
+  ui.Dialog.prototype.show.call(this);
+  this.el.find('.ok').focus();
+  this.callback = fn || function(){};
+  return this;
+};
+
+/**
+ * Render with the given `options`.
+ *
+ * Emits "cancel" event.
+ * Emits "ok" event.
+ *
+ * @param {Object} options
+ * @api public
+ */
+
+Alert.prototype.render = function(options){
+  ui.Dialog.prototype.render.call(this, options);
+  var self = this
+    , actions = $(html);
+
+  this.el.addClass('alert');
+  this.el.append(actions);
+
+  this.on('close', function(){
+    self.emit('cancel');
+    self.callback(false);
+  });
+
+  actions.find('.cancel').click(function(e){
+    e.preventDefault();
+    self.emit('cancel');
+    self.callback(false);
+    self.hide();
+  });
+
+  actions.find('.ok').click(function(e){
+    e.preventDefault();
+    self.emit('ok');
+    self.callback(true);
+    self.hide();
+  });
+
+};
+
+})(ui, "<div class=\"actions\">\r\n  <button class=\"cancel hide\">Cancel</button>\r\n  <button class=\"ok main hide\">Ok</button>\r\n</div>");
+;(function(exports, html){
+
+/**
  * Expose `ColorPicker`.
  */
 
@@ -934,147 +1075,6 @@ ColorPicker.prototype.renderMain = function(options){
 ;(function(exports, html){
 
 /**
- * Expose `Alert`.
- */
-
-exports.Alert = Alert;
-
-/**
- * Return a new `Alert` dialog with the given
- * `title` and `msg`.
- *
- * @param {String} title or msg
- * @param {String} msg
- * @return {Dialog}
- * @api public
- */
-
-exports.alert = function(title, msg){
-  switch (arguments.length) {
-    case 2:
-      return new Alert({ title: title, message: msg });
-    case 1:
-      return new Alert({ message: title });
-  }
-};
-
-/**
- * Initialize a new `Alert` dialog.
- *
- * Options:
- *
- *    - `title` dialog title
- *    - `message` a message to display
- *
- * Emits:
- *
- *    - `cancel` the user pressed cancel or closed the dialog
- *    - `ok` the user clicked ok
- *    - `show` when visible
- *    - `hide` when hidden
- *
- * @param {Object} options
- * @api public
- */
-
-function Alert(options) {
-  ui.Dialog.call(this, options);
-}
-
-/**
- * Inherit from `Dialog.prototype`.
- */
-
-Alert.prototype = new ui.Dialog();
-
-/**
- * Change "cancel" button `text`.
- *
- * @param {String} text
- * @return {Alert}
- * @api public
- */
-
-Alert.prototype.cancel = function(text){
-  var cancel = this.el.find('.cancel');
-  cancel.text(text);
-  cancel.removeClass('hide');
-  return this;
-};
-
-/**
- * Change "ok" button `text`.
- *
- * @param {String} text
- * @return {Alert}
- * @api public
- */
-
-Alert.prototype.ok = function(text){
-  var ok = this.el.find('.ok');
-  ok.text(text);
-  ok.removeClass('hide');
-  return this;
-};
-
-/**
- * Show the confirmation dialog and invoke `fn(ok)`.
- *
- * @param {Function} fn
- * @return {Alert} for chaining
- * @api public
- */
-
-Alert.prototype.show = function(fn){
-  ui.Dialog.prototype.show.call(this);
-  this.el.find('.ok').focus();
-  this.callback = fn || function(){};
-  return this;
-};
-
-/**
- * Render with the given `options`.
- *
- * Emits "cancel" event.
- * Emits "ok" event.
- *
- * @param {Object} options
- * @api public
- */
-
-Alert.prototype.render = function(options){
-  ui.Dialog.prototype.render.call(this, options);
-  var self = this
-    , actions = $(html);
-
-  this.el.addClass('alert');
-  this.el.append(actions);
-
-  this.on('close', function(){
-    self.emit('cancel');
-    self.callback(false);
-  });
-
-  actions.find('.cancel').click(function(e){
-    e.preventDefault();
-    self.emit('cancel');
-    self.callback(false);
-    self.hide();
-  });
-
-  actions.find('.ok').click(function(e){
-    e.preventDefault();
-    self.emit('ok');
-    self.callback(true);
-    self.hide();
-  });
-
-};
-
-})(ui, "<div class=\"actions\">\r\n  <button class=\"cancel hide\">Cancel</button>\r\n  <button class=\"ok main hide\">Ok</button>\r\n</div>");
-;(function(exports, html){
-
-/**
  * Notification list.
  */
 
@@ -1314,123 +1314,6 @@ Notification.prototype.remove = function(){
   return this;
 };
 })(ui, "<li class=\"notification hide\">\r\n  <div class=\"content\">\r\n    <h1>Title</h1>\r\n    <a href=\"#\" class=\"close\">×</a>\r\n    <p>Message</p>\r\n  </div>\r\n</li>");
-;(function(exports, html){
-
-/**
- * Expose `Card`.
- */
-
-exports.Card = Card;
-
-/**
- * Create a new `Card`.
- *
- * @param {Mixed} front
- * @param {Mixed} back
- * @return {Card}
- * @api public
- */
-
-exports.card = function(front, back){
-  return new Card(front, back);
-};
-
-/**
- * Initialize a new `Card` with content
- * for face `front` and `back`.
- *
- * Emits "flip" event.
- *
- * @param {Mixed} front
- * @param {Mixed} back
- * @api public
- */
-
-function Card(front, back) {
-  ui.Emitter.call(this);
-  this._front = front || $('<p>front</p>');
-  this._back = back  || $('<p>back</p>');
-  this.template = html;
-  this.render();
-};
-
-/**
- * Inherit from `Emitter.prototype`.
- */
-
-Card.prototype = new ui.Emitter;
-
-/**
- * Set front face `val`.
- *
- * @param {Mixed} val
- * @return {Card}
- * @api public
- */
-
-Card.prototype.front = function(val){
-  this._front = val;
-  this.render();
-  return this;
-};
-
-/**
- * Set back face `val`.
- *
- * @param {Mixed} val
- * @return {Card}
- * @api public
- */
-
-Card.prototype.back = function(val){
-  this._back = val;
-  this.render();
-  return this;
-};
-
-/**
- * Flip the card.
- *
- * @return {Card} for chaining
- * @api public
- */
-
-Card.prototype.flip = function(){
-  this.emit('flip');
-  this.el.toggleClass('flipped');
-  return this;
-};
-
-/**
- * Set the effect to `type`.
- *
- * @param {String} type
- * @return {Dialog} for chaining
- * @api public
- */
-
-Card.prototype.effect = function(type){
-  this.el.addClass(type);
-  return this;
-};
-
-/**
- * Render with the given `options`.
- *
- * @param {Object} options
- * @api public
- */
-
-Card.prototype.render = function(options){
-  var self = this
-    , el = this.el = $(this.template);
-  el.find('.front').empty().append(this._front.el || $(this._front));
-  el.find('.back').empty().append(this._back.el || $(this._back));
-  el.click(function(){
-    self.flip();
-  });
-};
-})(ui, "<div class=\"card\">\r\n  <div class=\"wrapper\">\r\n    <div class=\"face front\">1</div>\r\n    <div class=\"face back\">2</div>\r\n  </div>\r\n</div>");
 ;(function(exports, html){
 
 /**
@@ -1783,3 +1666,120 @@ SplitButton.prototype.render = function(options){
 };
 
 })(ui, "<div class=\"split-button\">\r\n  <a class=\"button\" href=\"#\">Action</a>\r\n  <a class=\"toggle\" href=\"#\"><span></span></a>\r\n</div>");
+;(function(exports, html){
+
+/**
+ * Expose `Card`.
+ */
+
+exports.Card = Card;
+
+/**
+ * Create a new `Card`.
+ *
+ * @param {Mixed} front
+ * @param {Mixed} back
+ * @return {Card}
+ * @api public
+ */
+
+exports.card = function(front, back){
+  return new Card(front, back);
+};
+
+/**
+ * Initialize a new `Card` with content
+ * for face `front` and `back`.
+ *
+ * Emits "flip" event.
+ *
+ * @param {Mixed} front
+ * @param {Mixed} back
+ * @api public
+ */
+
+function Card(front, back) {
+  ui.Emitter.call(this);
+  this._front = front || $('<p>front</p>');
+  this._back = back  || $('<p>back</p>');
+  this.template = html;
+  this.render();
+};
+
+/**
+ * Inherit from `Emitter.prototype`.
+ */
+
+Card.prototype = new ui.Emitter;
+
+/**
+ * Set front face `val`.
+ *
+ * @param {Mixed} val
+ * @return {Card}
+ * @api public
+ */
+
+Card.prototype.front = function(val){
+  this._front = val;
+  this.render();
+  return this;
+};
+
+/**
+ * Set back face `val`.
+ *
+ * @param {Mixed} val
+ * @return {Card}
+ * @api public
+ */
+
+Card.prototype.back = function(val){
+  this._back = val;
+  this.render();
+  return this;
+};
+
+/**
+ * Flip the card.
+ *
+ * @return {Card} for chaining
+ * @api public
+ */
+
+Card.prototype.flip = function(){
+  this.emit('flip');
+  this.el.toggleClass('flipped');
+  return this;
+};
+
+/**
+ * Set the effect to `type`.
+ *
+ * @param {String} type
+ * @return {Dialog} for chaining
+ * @api public
+ */
+
+Card.prototype.effect = function(type){
+  this.el.addClass(type);
+  return this;
+};
+
+/**
+ * Render with the given `options`.
+ *
+ * @param {Object} options
+ * @api public
+ */
+
+Card.prototype.render = function(options){
+  var self = this
+    , el = this.el = $(this.template);
+  el.find('.front').empty().append(this._front.el || $(this._front));
+  el.find('.back').empty().append(this._back.el || $(this._back));
+  el.click(function(){
+    self.flip();
+  });
+};
+})(ui, "<div class=\"card\">\r\n  <div class=\"wrapper\">\r\n    <div class=\"face front\">1</div>\r\n    <div class=\"face back\">2</div>\r\n  </div>\r\n</div>");
