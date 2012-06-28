@@ -32,6 +32,7 @@ function next(i) {
 
 console.log();
 js.write('var ui = {};\n');
+js.write('if (module && module.exports) { module.exports = ui; }\n');
 next(0);
 process.on('exit', function(){
   console.log();
