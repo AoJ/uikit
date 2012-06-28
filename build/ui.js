@@ -161,7 +161,7 @@ function Dialog(options) {
   if (active && !active.hiding) active.hide();
   if (Dialog.effect) this.effect(Dialog.effect);
   active = this;
-};
+}
 
 /**
  * Inherit from `Emitter.prototype`.
@@ -357,6 +357,88 @@ Dialog.prototype.remove = function(){
 };
 
 })(ui, "<div id=\"dialog\" class=\"hide\">\r\n  <div class=\"content\">\r\n    <h1>Title</h1>\r\n    <a href=\"#\" class=\"close\">×</a>\r\n    <p>Message</p>\r\n  </div>\r\n</div>");
+;(function(exports, html){
+
+/**
+ * Expose `Overlay`.
+ */
+
+exports.Overlay = Overlay;
+
+/**
+ * Return a new `Overlay` with the given `options`.
+ *
+ * @param {Object} options
+ * @return {Overlay}
+ * @api public
+ */
+
+exports.overlay = function(options){
+  return new Overlay(options);
+};
+
+/**
+ * Initialize a new `Overlay`.
+ *
+ * @param {Object} options
+ * @api public
+ */
+
+function Overlay(options) {
+  ui.Emitter.call(this);
+  var self = this;
+  options = options || {};
+  this.closable = options.closable;
+  this.el = $(html);
+  this.el.appendTo('body');
+  if (this.closable) {
+    this.el.click(function(){
+      self.hide();
+    });
+  }
+}
+
+/**
+ * Inherit from `Emitter.prototype`.
+ */
+
+Overlay.prototype = new ui.Emitter;
+
+/**
+ * Show the overlay.
+ *
+ * Emits "show" event.
+ *
+ * @return {Overlay} for chaining
+ * @api public
+ */
+
+Overlay.prototype.show = function(){
+  this.emit('show');
+  this.el.removeClass('hide');
+  return this;
+};
+
+/**
+ * Hide the overlay.
+ *
+ * Emits "hide" event.
+ *
+ * @return {Overlay} for chaining
+ * @api public
+ */
+
+Overlay.prototype.hide = function(){
+  var self = this;
+  this.emit('hide');
+  this.el.addClass('hide');
+  setTimeout(function(){
+    self.el.remove();
+  }, 2000);
+  return this;
+};
+
+})(ui, "<div id=\"overlay\" class=\"hide\"></div>");
 ;(function(exports, html){
 
 /**
@@ -634,88 +716,6 @@ Alert.prototype.render = function(options){
 };
 
 })(ui, "<div class=\"actions\">\r\n  <button class=\"cancel hide\">Cancel</button>\r\n  <button class=\"ok main hide\">Ok</button>\r\n</div>");
-;(function(exports, html){
-
-/**
- * Expose `Overlay`.
- */
-
-exports.Overlay = Overlay;
-
-/**
- * Return a new `Overlay` with the given `options`.
- *
- * @param {Object} options
- * @return {Overlay}
- * @api public
- */
-
-exports.overlay = function(options){
-  return new Overlay(options);
-};
-
-/**
- * Initialize a new `Overlay`.
- *
- * @param {Object} options
- * @api public
- */
-
-function Overlay(options) {
-  ui.Emitter.call(this);
-  var self = this;
-  options = options || {};
-  this.closable = options.closable;
-  this.el = $(html);
-  this.el.appendTo('body');
-  if (this.closable) {
-    this.el.click(function(){
-      self.hide();
-    });
-  }
-}
-
-/**
- * Inherit from `Emitter.prototype`.
- */
-
-Overlay.prototype = new ui.Emitter;
-
-/**
- * Show the overlay.
- *
- * Emits "show" event.
- *
- * @return {Overlay} for chaining
- * @api public
- */
-
-Overlay.prototype.show = function(){
-  this.emit('show');
-  this.el.removeClass('hide');
-  return this;
-};
-
-/**
- * Hide the overlay.
- *
- * Emits "hide" event.
- *
- * @return {Overlay} for chaining
- * @api public
- */
-
-Overlay.prototype.hide = function(){
-  var self = this;
-  this.emit('hide');
-  this.el.addClass('hide');
-  setTimeout(function(){
-    self.el.remove();
-  }, 2000);
-  return this;
-};
-
-})(ui, "<div id=\"overlay\" class=\"hide\"></div>");
 ;(function(exports, html){
 
 /**
@@ -1069,6 +1069,117 @@ ColorPicker.prototype.renderMain = function(options){
   ctx.restore();
 };
 })(ui, "<div class=\"color-picker\">\r\n  <canvas class=\"main\"></canvas>\r\n  <canvas class=\"spectrum\"></canvas>\r\n</div>");
+;(function(exports, html){
+
+/**
+ * Expose `SplitButton`.
+ */
+
+exports.SplitButton = SplitButton;
+
+/**
+ * Initialize a new `SplitButton`
+ * with an optional `label`.
+ *
+ * @param {String} label
+ * @api public
+ */
+
+function SplitButton(label) {
+  ui.Emitter.call(this);
+  this.el = $(html);
+  this.events();
+  this.render({ label: label });
+  this.state = 'hidden';
+}
+
+/**
+ * Inherit from `Emitter.prototype`.
+ */
+
+SplitButton.prototype = new ui.Emitter;
+
+/**
+ * Register event handlers.
+ *
+ * @api private
+ */
+
+SplitButton.prototype.events = function(){
+  var self = this
+    , el = this.el;
+
+  el.find('.button').click(function(e){
+    e.preventDefault();
+    self.emit('click', e);
+  });
+
+  el.find('.toggle').click(function(e){
+    e.preventDefault();
+    self.toggle();
+  });
+};
+
+/**
+ * Toggle the drop-down contents.
+ *
+ * @return {SplitButton}
+ * @api public
+ */
+
+SplitButton.prototype.toggle = function(){
+  return 'hidden' == this.state
+    ? this.show()
+    : this.hide();
+};
+
+/**
+ * Show the drop-down contents.
+ *
+ * @return {SplitButton}
+ * @api public
+ */
+
+SplitButton.prototype.show = function(){
+  this.state = 'visible';
+  this.emit('show');
+  this.el.addClass('show');
+  return this;
+};
+
+/**
+ * Hide the drop-down contents.
+ *
+ * @return {SplitButton}
+ * @api public
+ */
+
+SplitButton.prototype.hide = function(){
+  this.state = 'hidden';
+  this.emit('hide');
+  this.el.removeClass('show');
+  return this;
+};
+
+/**
+ * Render the split-button with the given `options`.
+ *
+ * @param {Object} options
+ * @return {SplitButton}
+ * @api private
+ */
+
+SplitButton.prototype.render = function(options){
+  var options = options || {}
+    , button = this.el.find('.button')
+    , label = options.label;
+
+  if ('string' == label) button.text(label);
+  else button.text('').append(label);
+  return this;
+};
+
+})(ui, "<div class=\"split-button\">\r\n  <a class=\"button\" href=\"#\">Action</a>\r\n  <a class=\"toggle\" href=\"#\"><span></span></a>\r\n</div>");
 ;(function(exports, html){
 
 /**
@@ -1552,117 +1663,6 @@ function slug(str) {
 }
 
 })(ui, "<div class=\"menu\">\r\n</div>");
-;(function(exports, html){
-
-/**
- * Expose `SplitButton`.
- */
-
-exports.SplitButton = SplitButton;
-
-/**
- * Initialize a new `SplitButton`
- * with an optional `label`.
- *
- * @param {String} label
- * @api public
- */
-
-function SplitButton(label) {
-  ui.Emitter.call(this);
-  this.el = $(html);
-  this.events();
-  this.render({ label: label });
-  this.state = 'hidden';
-}
-
-/**
- * Inherit from `Emitter.prototype`.
- */
-
-SplitButton.prototype = new ui.Emitter;
-
-/**
- * Register event handlers.
- *
- * @api private
- */
-
-SplitButton.prototype.events = function(){
-  var self = this
-    , el = this.el;
-
-  el.find('.button').click(function(e){
-    e.preventDefault();
-    self.emit('click', e);
-  });
-
-  el.find('.toggle').click(function(e){
-    e.preventDefault();
-    self.toggle();
-  });
-};
-
-/**
- * Toggle the drop-down contents.
- *
- * @return {SplitButton}
- * @api public
- */
-
-SplitButton.prototype.toggle = function(){
-  return 'hidden' == this.state
-    ? this.show()
-    : this.hide();
-};
-
-/**
- * Show the drop-down contents.
- *
- * @return {SplitButton}
- * @api public
- */
-
-SplitButton.prototype.show = function(){
-  this.state = 'visible';
-  this.emit('show');
-  this.el.addClass('show');
-  return this;
-};
-
-/**
- * Hide the drop-down contents.
- *
- * @return {SplitButton}
- * @api public
- */
-
-SplitButton.prototype.hide = function(){
-  this.state = 'hidden';
-  this.emit('hide');
-  this.el.removeClass('show');
-  return this;
-};
-
-/**
- * Render the split-button with the given `options`.
- *
- * @param {Object} options
- * @return {SplitButton}
- * @api private
- */
-
-SplitButton.prototype.render = function(options){
-  var options = options || {}
-    , button = this.el.find('.button')
-    , label = options.label;
-
-  if ('string' == label) button.text(label);
-  else button.text('').append(label);
-  return this;
-};
-
-})(ui, "<div class=\"split-button\">\r\n  <a class=\"button\" href=\"#\">Action</a>\r\n  <a class=\"toggle\" href=\"#\"><span></span></a>\r\n</div>");
 ;(function(exports, html){
 
 /**
