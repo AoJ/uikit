@@ -104,6 +104,11 @@
 #overlay.hide {
   pointer-events: none;
   opacity: 0;
+}
+
+body > .shadowed {
+  -webkit-filter: blur(4px) grayscale(0.5);
+  -webkit-transition: -webkit-filter 1s ease;
 }.confirmation .actions {
   border-top: 1px solid #eee;
   padding: 5px;
