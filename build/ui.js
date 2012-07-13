@@ -1861,7 +1861,7 @@ Tabs.prototype = new ui.Emitter();
 Tabs.prototype.render = function(options){
   var el = this.el = options.tabs;
   var tabs = el.find('li');
-  var tabContainers = $(tabs.toArray().map(getTabTarget));
+  var tabContainers = $(tabs.toArray().map(getTabTarget).join(', '));
 
   // Add CSS classes
   el.addClass('tabs');
@@ -1883,6 +1883,7 @@ Tabs.prototype.render = function(options){
  * Select the given tab
  * @param  {Object} el - Select the given tab (selector or jQuery element)
  */
+
 Tabs.prototype.selectTab = function(el) {
   // Set tab as selected
   this.el.find('li.selected').removeClass('selected');
@@ -1914,4 +1915,5 @@ var getTabTarget = function(el) {
   if (!tabTarget) { tabTarget = el.attr('href'); }
   return tabTarget;
 };
+
 })(ui, "");
