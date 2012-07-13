@@ -104,7 +104,6 @@ Emitter.prototype.emit = function(event){
 
 })(ui);
 ;(function(exports, html){
-
 /**
  * Active dialog.
  */
@@ -251,12 +250,17 @@ Dialog.prototype.modal = function(){
 
 Dialog.prototype.overlay = function(){
   var self = this;
-  this._overlay = ui
-    .overlay({ closable: true })
-    .on('hide', function(){
-      self.closedOverlay = true;
-      self.hide();
-    });
+  var overlay = ui.overlay({ closable: true });
+
+  overlay.on('hide', function(){
+    self.closedOverlay = true;
+  });
+
+  overlay.on('close', function(){
+    self.emit('close');
+  });
+
+  this._overlay = overlay;
   return this;
 };
 
@@ -271,6 +275,7 @@ Dialog.prototype.escapable = function(){
   $(document).bind('keydown.dialog', function(e){
     if (27 != e.which) return;
     $(this).unbind('keydown.dialog');
+    self.emit('escape');
     self.hide();
   });
 };
@@ -352,12 +357,12 @@ Dialog.prototype.hide = function(ms){
 Dialog.prototype.remove = function(){
   this.emit('hide');
   this.el.remove();
+  $(document).unbind('keydown.dialog');
   return this;
 };
 
 })(ui, "<div id=\"dialog\" class=\"hide\">\r\n  <div class=\"content\">\r\n    <h1>Title</h1>\r\n    <a href=\"#\" class=\"close\">×</a>\r\n    <p>Message</p>\r\n  </div>\r\n</div>");
 ;(function(exports, html){
-
 /**
  * Expose `Overlay`.
  */
@@ -392,6 +397,7 @@ function Overlay(options) {
   this.el.appendTo('body');
   if (this.closable) {
     this.el.click(function(){
+      self.emit('close');
       self.hide();
     });
   }
@@ -442,7 +448,6 @@ Overlay.prototype.hide = function(){
 
 })(ui, "<div id=\"overlay\" class=\"hide\"></div>");
 ;(function(exports, html){
-
 /**
  * Expose `Confirmation`.
  */
@@ -557,6 +562,11 @@ Confirmation.prototype.render = function(options){
   this.el.append(actions);
 
   this.on('close', function(){
+    self.emit('cancel');
+    self.callback(false);
+  });
+
+  this.on('escape', function(){
     self.emit('cancel');
     self.callback(false);
   });
