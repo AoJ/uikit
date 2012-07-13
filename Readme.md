@@ -34,3 +34,19 @@
   Then run the tests:
 
       $ make test
+
+## Tabs HTML
+
+The Tabs component requires a small bit of markup.
+
+#### Tabs
+
+  <ul>
+    <li href="#tab1">Tab Item 1</li>
+    <li data-tab-target=".second-tab">Tab Item 1</li>
+  </ul>
+
+#### Tab Containers
+
+  <div id="tab1"></div>
+  <div class="second-tab"></div>
