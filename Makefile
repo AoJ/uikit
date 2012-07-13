@@ -8,7 +8,8 @@ COMPONENTS = emitter \
   notification \
   split-button \
   menu \
-  card
+  card \
+  tabs
 
 ui:
 	@rm -fr build
