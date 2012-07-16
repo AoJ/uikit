@@ -9,7 +9,8 @@ COMPONENTS = emitter \
   split-button \
   menu \
   card \
-  tabs
+  tabs \
+  interactivedialog
 
 ui:
 	@rm -fr build
