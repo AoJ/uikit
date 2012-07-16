@@ -3,15 +3,15 @@
 
   UIKit is a small (4kb minified / gzipped) collection of flexible, cohesive, decoupled components for the modern web. With an emphasis on structure-only styling making it simple to apply application specific styling. UIKit is _not_ a replacement for larger UI frameworks, nor is it a CSS framework such as Bootstrap. UIKit is still a work in progress, check the [Issues](https://github.com/visionmedia/uikit/issues).
 
-You are now viewing the BlogFrog fork of uikit, which adds the following:
+#### You are now viewing the BlogFrog fork of uikit, which adds the following:
 
-## Components
+## New Components
 
   - [ui.Alert](https://github.com/blogfrog/uikit/tree/master/lib/components/alert/alert.js) Alert, just like in javascript, but prettier.  [Pulled from witcraft](https://github.com/witcraft/uikit/commit/80c6bff7634e854cf6a1e3d7ef08d2462feeb82d)
   - [ui.Tabs](https://github.com/blogfrog/uikit/tree/master/lib/components/tabs/tabs.js) a simple tab interface (requires HTML)
   - [ui.InteractiveDialog](https://github.com/blogfrog/uikit/tree/master/lib/components/interactivedialog/interactivedialog.js) a wrapper for a higher level (and larger) dialog
 
-## Features
+## New Features
 
   - Set emitter context.  ie. `dialog.context(whatever)` means `dialog.on('event', function() { /* this === whatever */ })`
   - Emitter.on accepts an object with event -> callback mappings for multiple binding
