@@ -7,7 +7,7 @@ You are now viewing the BlogFrog fork of uikit, which adds the following:
 
 ## Components
 
-  - [ui.Alert](https://github.com/blogfrog/uikit/tree/master/lib/components/alert/alert.js) a simple tab interface (requires HTML)
+  - [ui.Alert](https://github.com/blogfrog/uikit/tree/master/lib/components/alert/alert.js) Alert, just like in javascript, but prettier.  [Pulled from witcraft](https://github.com/witcraft/uikit/commit/80c6bff7634e854cf6a1e3d7ef08d2462feeb82d)
   - [ui.Tabs](https://github.com/blogfrog/uikit/tree/master/lib/components/tabs/tabs.js) a simple tab interface (requires HTML)
   - [ui.InteractiveDialog](https://github.com/blogfrog/uikit/tree/master/lib/components/interactivedialog/interactivedialog.js) a wrapper for a higher level (and larger) dialog
 
