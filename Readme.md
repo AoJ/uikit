@@ -14,8 +14,8 @@
 ## New Features
 
   - Set emitter context.  ie. `dialog.context(whatever)` means `dialog.on('event', function() { /* this === whatever */ })`
-  - Emitter.on accepts an object with event -> callback mappings for multiple binding
-  - uikit wrapped in module.exports for use in CommonJS applications
+  - `Emitter.on` accepts an object with event -> callback mappings for multiple binding
+  - uikit wrapped in `module.exports` for use in CommonJS applications
 
 ## Custom builds
 
