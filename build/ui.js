@@ -10,12 +10,24 @@ exports.Emitter = Emitter;
 
 /**
  * Initialize a new `Emitter`.
- * 
+ *
  * @api public
  */
 
 function Emitter() {
   this.callbacks = {};
+}
+
+/**
+ * Bind a given context to all callback functions, overriding the default "this"
+ * @param  {Object} The context which will be bound on callback function
+ * @return {Emitter}
+ * @api public
+  */
+
+Emitter.prototype.context = function(c) {
+  this.context = c;
+  return this;
 };
 
 /**
@@ -28,8 +40,16 @@ function Emitter() {
  */
 
 Emitter.prototype.on = function(event, fn){
-  (this.callbacks[event] = this.callbacks[event] || [])
-    .push(fn);
+  var addCallback = function(ev, cb){ (this.callbacks[ev] = this.callbacks[ev] || []).push(cb); }.bind(this);
+  if (typeof event === 'string') {
+    addCallback(event);
+  } else if (typeof event === 'object') {
+    for (var key in event) {
+      if (event.hasOwnProperty(key)) {
+        addCallback(key, event[key]);
+      }
+    }
+  }
   return this;
 };
 
@@ -86,7 +106,7 @@ Emitter.prototype.off = function(event, fn){
  *
  * @param {String} event
  * @param {Mixed} ...
- * @return {Emitter} 
+ * @return {Emitter}
  */
 
 Emitter.prototype.emit = function(event){
@@ -95,12 +115,16 @@ Emitter.prototype.emit = function(event){
 
   if (callbacks) {
     for (var i = 0, len = callbacks.length; i < len; ++i) {
-      callbacks[i].apply(this, args);
+      var context = this.context || this;
+      if (typeof callbacks[i] === 'function') {
+        callbacks[i].apply(context, args);
+      }
     }
   }
 
   return this;
 };
+
 
 })(ui);
 ;(function(exports, html){
@@ -361,7 +385,7 @@ Dialog.prototype.remove = function(){
   return this;
 };
 
-})(ui, "<div id=\"dialog\" class=\"hide\">\r\n  <div class=\"content\">\r\n    <h1>Title</h1>\r\n    <a href=\"#\" class=\"close\">×</a>\r\n    <p>Message</p>\r\n  </div>\r\n</div>");
+})(ui, "<div id=\"dialog\" class=\"dialog hide\">\r\n  <div class=\"content\">\r\n    <h1>Title</h1>\r\n    <a href=\"#\" class=\"close\">×</a>\r\n    <p>Message</p>\r\n  </div>\r\n</div>");
 ;(function(exports, html){
 /**
  * Expose `Overlay`.
@@ -1892,7 +1916,7 @@ Tabs.prototype.selectTab = function(el) {
 
   // Show relevant tab content
   hideAllTabs(this.el);
-  $(getTabTarget(this.selectedEl)).show();
+  this.el.parent().find(getTabTarget(this.selectedEl)).show();
 
   // Emite event
   this.emit('tabchange');
@@ -1905,8 +1929,9 @@ Tabs.prototype.selectTab = function(el) {
 var hideAllTabs = function(tabs) {
   // Build list of selectors
   var selectors = tabs.find('li').toArray().map(getTabTarget);
+  var parent = tabs.parent();
   // Select all the tab areas and hide
-  $(selectors.join(', ')).hide();
+  parent.find(selectors.join(', ')).hide();
 };
 
 var getTabTarget = function(el) {
@@ -1914,6 +1939,165 @@ var getTabTarget = function(el) {
   var tabTarget = el.attr('data-tab-target');
   if (!tabTarget) { tabTarget = el.attr('href'); }
   return tabTarget;
+};
+
+})(ui, "");
+;(function(exports, html){
+
+/**
+ * Expose `InteractiveDialog`.
+ */
+
+exports.InteractiveDialog = InteractiveDialog;
+
+/**
+ * Return a new `InteractiveDialog` dialog with the given
+ * `title` and `msg`.
+ *
+ * @param {String} title or msg
+ * @param {String} msg
+ * @return {Dialog}
+ * @api public
+ */
+
+exports.interactiveDialog = function(title, msg){
+  switch (arguments.length) {
+    case 2:
+      return new InteractiveDialog({ title: title, message: msg });
+    case 1:
+      return new InteractiveDialog({ message: title });
+  }
+};
+
+/**
+ * Initialize a new `InteractiveDialog` dialog.
+ *
+ * Options:
+ *
+ *    - `title` dialog title
+ *    - `message` a message to display
+ *
+ * Emits:
+ *
+ *    - `cancel` the user pressed cancel or closed the dialog
+ *    - `ok` the user clicked ok
+ *    - `show` when visible
+ *    - `hide` when hidden
+ *
+ * @param {Object} options
+ * @api public
+ */
+
+function InteractiveDialog(options) {
+  ui.Dialog.call(this, options);
+}
+
+/**
+ * Inherit from `Dialog.prototype`.
+ */
+
+InteractiveDialog.prototype = new ui.Dialog();
+
+/**
+ * Change "cancel" button `selector`.
+ *
+ * @param {String} selector
+ * @return {InteractiveDialog}
+ * @api public
+ */
+
+InteractiveDialog.prototype.cancel = function(selector){
+  var cancel = this.el.find('.cancel');
+  if (cancel.length > 0) { cancel.replaceWith(selector); }
+  else { cancel = this.el.find(selector); }
+  cancel.addClass('cancel').removeClass('hide');
+  return this;
+};
+
+/**
+ * Change "ok" button `selector`.
+ *
+ * @param {String} selector
+ * @return {InteractiveDialog}
+ * @api public
+ */
+
+InteractiveDialog.prototype.ok = function(selector){
+  var ok = this.el.find('.ok');
+  if (ok.length > 0) { ok.replaceWith(selector); }
+  else { ok = this.el.find(selector); }
+  ok.addClass('ok').removeClass('hide');
+  return this;
+};
+
+/**
+ * Show the confirmation dialog and invoke `fn(ok)`.
+ *
+ * @param {Function} fn
+ * @return {InteractiveDialog} for chaining
+ * @api public
+ */
+
+InteractiveDialog.prototype.show = function(fn){
+  ui.Dialog.prototype.show.call(this);
+  this.el.find('.ok').focus();
+  this.callback = fn || function(){};
+  return this;
+};
+
+/**
+ * Render with the given `options`.
+ *
+ * @param {Object} options
+ * @api public
+ */
+
+InteractiveDialog.prototype.render = function(options){
+  ui.Dialog.prototype.render.call(this, options);
+  var self = this
+    , actions = $(html);
+
+  this.el.addClass('interactive');
+  this.el.append(actions);
+
+  var close = function() {
+    self.emit('close');
+    self.callback(false);
+    self.hide();
+  }.bind(this);
+
+  var ok = function() {
+    self.emit('ok');
+    self.emit('close');
+    self.callback(true);
+    self.hide();
+  }.bind(this);
+
+  // Cancel/close
+  this.on('close', close);
+  this.el.on('click', '.cancel', function(e){
+    e.preventDefault();
+    close();
+  });
+
+  // OK
+  this.el.on('click', '.ok', function(e){
+    e.preventDefault();
+    ok();
+  });
+
+  // "Ok" on enter
+  this.el.on('keydown', function (e) {
+    if(e.which === 13 || e.keyCode === 13){
+      ok();
+      e.preventDefault();
+    }
+  }.bind(this));
+
+  // Focus on first input element
+  setTimeout(function(){
+      this.el.find('input:first').focus();
+  }.bind(this));
 };
 
 })(ui, "");
