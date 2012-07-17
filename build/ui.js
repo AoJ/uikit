@@ -42,7 +42,7 @@ Emitter.prototype.context = function(c) {
 Emitter.prototype.on = function(event, fn){
   var addCallback = function(ev, cb){ (this.callbacks[ev] = this.callbacks[ev] || []).push(cb); }.bind(this);
   if (typeof event === 'string') {
-    addCallback(event);
+    addCallback(event, fn);
   } else if (typeof event === 'object') {
     for (var key in event) {
       if (event.hasOwnProperty(key)) {
@@ -407,7 +407,7 @@ exports.overlay = function(options){
 
 /**
  * Initialize a new `Overlay`.
- *
+ *.prototype.overlay
  * @param {Object} options
  * @api public
  */
@@ -431,7 +431,7 @@ function Overlay(options) {
  * Inherit from `Emitter.prototype`.
  */
 
-Overlay.prototype = new ui.Emitter;
+Overlay.prototype = new ui.Emitter();
 
 /**
  * Show the overlay.
@@ -2060,12 +2060,15 @@ InteractiveDialog.prototype.render = function(options){
   this.el.addClass('interactive');
   this.el.append(actions);
 
-  var close = function() {
+  // Cancel/close
+  this.el.on('click', '.cancel', function(e){
+    e.preventDefault();
     self.emit('close');
     self.callback(false);
     self.hide();
-  }.bind(this);
+  });
 
+  // OK
   var ok = function() {
     self.emit('ok');
     self.emit('close');
@@ -2073,14 +2076,6 @@ InteractiveDialog.prototype.render = function(options){
     self.hide();
   }.bind(this);
 
-  // Cancel/close
-  this.on('close', close);
-  this.el.on('click', '.cancel', function(e){
-    e.preventDefault();
-    close();
-  });
-
-  // OK
   this.el.on('click', '.ok', function(e){
     e.preventDefault();
     ok();
