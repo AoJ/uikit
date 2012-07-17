@@ -325,10 +325,21 @@ Dialog.prototype.show = function(){
   if (!overlay || overlay.closable) this.escapable();
 
   this.el.appendTo('body');
-  this.el.css({ marginLeft: -(this.el.width() / 2) + 'px' });
+
+  // Update centered position with window size changes
+  var updateSize = function() { this.el.css({ marginLeft: -(this.el.width() / 2) + 'px' }); }.bind(this);
+  var resizeTimer;
+  $(window).resize(function() {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(updateSize, 50);
+  });
+  setTimeout(updateSize, 50);
+
+
   this.emit('show');
   return this;
 };
+
 
 /**
  * Hide the dialog with optional delay of `ms`,
@@ -2059,6 +2070,9 @@ InteractiveDialog.prototype.render = function(options){
 
   this.el.addClass('interactive');
   this.el.append(actions);
+
+  // Move actions to outer parent if present
+  this.el.find('.actions').appendTo(this.el);
 
   // Cancel/close
   var close = function() {

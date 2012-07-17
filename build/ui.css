@@ -9,6 +9,14 @@
   z-index: 1000;
 }
 
+.dialog .actions {
+  border-top: 1px solid #eee;
+  padding: 5px 10px;
+  text-align: right;
+  background: #fafafa;
+  box-shadow: inset 0 1px 0 white;
+}
+
 .dialog .content {
   padding: 15px 20px;
 }
@@ -115,15 +123,7 @@ body > .shadowed {
   text-align: right;
   background: #fafafa;
   box-shadow: inset 0 1px 0 white;
-}.alert .actions {
-  border-top: 1px solid #eee;
-  padding: 5px;
-  text-align: right;
-  background: #fafafa;
-  box-shadow: inset 0 1px 0 white;
-}
-
-.alert .hide {
+}.alert .hide {
     display: none
 }.color-picker canvas {
   border: 1px solid #888;
@@ -380,6 +380,4 @@ li.tab:last-child {
   max-width: 75%;
   max-height: 75%;
   top: 15%;
-  left: 50%;
-  margin-left: -25%;
 }
