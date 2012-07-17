@@ -328,12 +328,10 @@ Dialog.prototype.show = function(){
 
   // Update centered position with window size changes
   var updateSize = function() { this.el.css({ marginLeft: -(this.el.width() / 2) + 'px' }); }.bind(this);
-  var resizeTimer;
   $(window).resize(function() {
-    clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(updateSize, 50);
+    setTimeout(updateSize, 1);
   });
-  setTimeout(updateSize, 50);
+  setTimeout(updateSize, 0);
 
 
   this.emit('show');
@@ -1929,8 +1927,9 @@ Tabs.prototype.selectTab = function(el) {
   hideAllTabs(this.el);
   this.el.parent().find(getTabTarget(this.selectedEl)).show();
 
-  // Emite event
+  // Emite events
   this.emit('tabchange');
+  $(window).resize();
 };
 
 
