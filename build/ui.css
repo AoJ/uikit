@@ -11,7 +11,7 @@
 
 .dialog .actions {
   border-top: 1px solid #eee;
-  padding: 5px 10px;
+  padding: 10px 30px;
   text-align: right;
   background: #fafafa;
   box-shadow: inset 0 1px 0 white;
@@ -296,6 +296,32 @@ body > .shadowed {
   background: #f1faff;
 }
 
+ul.tabs {
+  border-bottom: 1px solid #eee;
+}
+
+li.tab {
+  cursor: pointer;
+  border-top: 1px solid #eee;
+  border-left: 1px solid #eee;
+  display: inline-block;
+  line-height: 20px;
+  margin-left: 0;
+  margin-right: 0;
+  padding: 5px 10px;
+  text-decoration: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+}
+
+li.selected {
+  font-weight: bold;
+}
+
+li.tab:last-child {
+  border-right: 1px solid #eee;
+}
+
 /* from: http://desandro.github.com/3dtransforms */
 
 .card {
@@ -350,32 +376,6 @@ body > .shadowed {
   -webkit-transform: translateX(-100%) rotateY(180deg);
   -moz-transform: translateX(-100%) rotateY(180deg);
 }
-ul.tabs {
-  border-bottom: 1px solid #eee;
-}
-
-li.tab {
-  cursor: pointer;
-  border-top: 1px solid #eee;
-  border-left: 1px solid #eee;
-  display: inline-block;
-  line-height: 20px;
-  margin-left: 0;
-  margin-right: 0;
-  padding: 5px 10px;
-  text-decoration: none;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-}
-
-li.selected {
-  font-weight: bold;
-}
-
-li.tab:last-child {
-  border-right: 1px solid #eee;
-}
-
 .dialog.interactive {
   max-width: 75%;
   max-height: 75%;
