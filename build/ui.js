@@ -2061,11 +2061,16 @@ InteractiveDialog.prototype.render = function(options){
   this.el.append(actions);
 
   // Cancel/close
+  var close = function() {
+    self.callback(false);
+    self.hide();
+  };
+
+  this.on('close', close);
   this.el.on('click', '.cancel', function(e){
     e.preventDefault();
     self.emit('close');
-    self.callback(false);
-    self.hide();
+    close();
   });
 
   // OK
