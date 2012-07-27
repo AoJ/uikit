@@ -333,7 +333,6 @@ Dialog.prototype.show = function(){
   });
   setTimeout(updateSize, 0);
 
-
   this.emit('show');
   return this;
 };
@@ -1466,7 +1465,7 @@ SplitButton.prototype.render = function(options){
   return this;
 };
 
-})(ui, "<div class=\"split-button\">\r\n  <a class=\"button\" href=\"#\">Action</a>\r\n  <a class=\"toggle\" href=\"#\"><span></span></a>\r\n</div>");
+})(ui, "<div class=\"split-button\">\r\n  <a class=\"text\" href=\"#\">Action</a>\r\n  <a class=\"toggle\" href=\"#\"><span></span></a>\r\n</div>");
 ;(function(exports, html){
 
 /**

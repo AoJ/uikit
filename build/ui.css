@@ -1,4 +1,24 @@
-.dialog {
+#overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  opacity: 1;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,.75);
+  transition: opacity 300ms;
+  z-index: 500;
+}
+
+#overlay.hide {
+  pointer-events: none;
+  opacity: 0;
+}
+
+body > .shadowed {
+  -webkit-filter: blur(3px) grayscale(0.5);
+  -webkit-transition: -webkit-filter 1s ease;
+}.dialog {
   position: fixed;
   left: 50%;
   top: 150px;
@@ -97,26 +117,6 @@
 .dialog.scale.hide {
   -webkit-transform: scale(0);
   -moz-transform: scale(0);
-}#overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  opacity: 1;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,.75);
-  transition: opacity 300ms;
-  z-index: 500;
-}
-
-#overlay.hide {
-  pointer-events: none;
-  opacity: 0;
-}
-
-body > .shadowed {
-  -webkit-filter: blur(3px) grayscale(0.5);
-  -webkit-transition: -webkit-filter 1s ease;
 }.confirmation .actions {
   border-top: 1px solid #eee;
   padding: 5px;
@@ -131,7 +131,33 @@ body > .shadowed {
 .color-picker canvas:active {
   cursor: none;
 }
+.split-button {
+  display: inline-block;
+  border: 1px solid #eee;
+}
 
+.split-button a {
+  display: inline-block;
+  float: left;
+  height: 20px;
+  line-height: 20px;
+  padding: 5px 10px;
+  text-decoration: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+}
+
+.split-button .toggle {
+  border-left: 1px solid #eee;
+}
+
+.split-button .toggle span {
+  display: block;
+  margin-top: 8px;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 4px solid #888;
+}
 #notifications {
   position: fixed;
   top: 10px;
@@ -237,32 +263,6 @@ body > .shadowed {
 .notification.scale.hide {
   -webkit-transform: scale(0);
   -moz-transform: scale(0);
-}.split-button {
-  display: inline-block;
-  border: 1px solid #eee;
-}
-
-.split-button a {
-  display: inline-block;
-  float: left;
-  height: 20px;
-  line-height: 20px;
-  padding: 5px 10px;
-  text-decoration: none;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-}
-
-.split-button .toggle {
-  border-left: 1px solid #eee;
-}
-
-.split-button .toggle span {
-  display: block;
-  margin-top: 8px;
-  border-left: 4px solid transparent;
-  border-right: 4px solid transparent;
-  border-top: 4px solid #888;
 }.menu {
   position: absolute;
   top: 0;
@@ -294,6 +294,32 @@ body > .shadowed {
 .menu li a:hover,
 .menu li.selected a {
   background: #f1faff;
+}
+
+ul.tabs {
+  border-bottom: 1px solid #eee;
+}
+
+li.tab {
+  cursor: pointer;
+  border-top: 1px solid #eee;
+  border-left: 1px solid #eee;
+  display: inline-block;
+  line-height: 20px;
+  margin-left: 0;
+  margin-right: 0;
+  padding: 5px 10px;
+  text-decoration: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+}
+
+li.selected {
+  font-weight: bold;
+}
+
+li.tab:last-child {
+  border-right: 1px solid #eee;
 }
 
 /* from: http://desandro.github.com/3dtransforms */
@@ -350,32 +376,6 @@ body > .shadowed {
   -webkit-transform: translateX(-100%) rotateY(180deg);
   -moz-transform: translateX(-100%) rotateY(180deg);
 }
-ul.tabs {
-  border-bottom: 1px solid #eee;
-}
-
-li.tab {
-  cursor: pointer;
-  border-top: 1px solid #eee;
-  border-left: 1px solid #eee;
-  display: inline-block;
-  line-height: 20px;
-  margin-left: 0;
-  margin-right: 0;
-  padding: 5px 10px;
-  text-decoration: none;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-}
-
-li.selected {
-  font-weight: bold;
-}
-
-li.tab:last-child {
-  border-right: 1px solid #eee;
-}
-
 .dialog.interactive {
   max-width: 75%;
   max-height: 75%;
