@@ -741,6 +741,7 @@ Alert.prototype.render = function(options){
   this.on('close', function(){
     self.emit('cancel');
     self.callback(false);
+    self.hide();
   });
 
   actions.find('.cancel').click(function(e){
