@@ -393,7 +393,7 @@ Dialog.prototype.remove = function(){
   return this;
 };
 
-})(ui, "<div id=\"dialog\" class=\"ui-dialog ui-hide\">\r\n  <div class=\"ui-content\">\r\n    <h1>Title</h1>\r\n    <a href=\"#\" class=\"ui-close\">×</a>\r\n    <p>Message</p>\r\n  </div>\r\n</div>");
+})(ui, "<div id=\"ui-dialog\" class=\"ui-dialog ui-hide\">\r\n  <div class=\"ui-content\">\r\n    <h1>Title</h1>\r\n    <a href=\"#\" class=\"ui-close\">×</a>\r\n    <p>Message</p>\r\n  </div>\r\n</div>");
 ;(function(exports, html){
 /**
  * Expose `Overlay`.
@@ -478,7 +478,7 @@ Overlay.prototype.hide = function(){
   return this;
 };
 
-})(ui, "<div id=\"overlay\" class=\"ui-hide\"></div>");
+})(ui, "<div id=\"ui-overlay\" class=\"ui-hide\"></div>");
 ;(function(exports, html){
 /**
  * Expose `Confirmation`.
@@ -760,7 +760,7 @@ Alert.prototype.render = function(options){
 
 };
 
-})(ui, "<div class=\"ui-actions\">\r\n  <button class=\"ui-cancel ui-hide\">Cancel</button>\r\n  <button class=\"ui-ok ui-main hide\">Ok</button>\r\n</div>");
+})(ui, "<div class=\"ui-actions\">\r\n  <button class=\"ui-cancel ui-hide\">Cancel</button>\r\n  <button class=\"ui-ok ui-main ui-hide\">Ok</button>\r\n</div>");
 ;(function(exports, html){
 
 /**
@@ -1131,7 +1131,7 @@ exports.Notification = Notification;
 // list
 
 $(function(){
-  list = $('<ul id="notifications">');
+  list = $('<ul id="ui-notifications">');
   list.appendTo('body');
 })
 
