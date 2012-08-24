@@ -75,6 +75,8 @@ function build(name, fn) {
   var css = path.join(lib, name, name + '.css');
   if (path.existsSync(css)) {
     read(css, function(css){
+      css = css.replace(/\.([a-z]+)/g, '.ui-$1');
+      css = css.replace(/#(\w+)(?=[\s\.])/g, '#ui-$1');
       append('build/ui.css', css);
     });
   }

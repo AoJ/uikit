@@ -206,7 +206,7 @@ Dialog.prototype.render = function(options){
     , msg = options.message
     , self = this;
 
-  el.find('.close').click(function(){
+  el.find('.ui-close').click(function(){
     self.emit('close');
     self.hide();
     return false;
@@ -223,7 +223,7 @@ Dialog.prototype.render = function(options){
   }
 
   setTimeout(function(){
-    el.removeClass('hide');
+    el.removeClass('ui-hide');
   }, 0);
 };
 
@@ -235,7 +235,7 @@ Dialog.prototype.render = function(options){
  */
 
 Dialog.prototype.closable = function(){
-  this.el.addClass('closable');
+  this.el.addClass('ui-closable');
   return this;
 };
 
@@ -249,7 +249,7 @@ Dialog.prototype.closable = function(){
 
 Dialog.prototype.effect = function(type){
   this._effect = type;
-  this.el.addClass(type);
+  this.el.addClass('ui-' + type);
   return this;
 };
 
@@ -318,7 +318,7 @@ Dialog.prototype.show = function(){
 
   if (overlay) {
     overlay.show();
-    this.el.addClass('modal');
+    this.el.addClass('ui-modal');
   }
 
   // escape
@@ -364,7 +364,7 @@ Dialog.prototype.hide = function(ms){
   }
 
   // hide / remove
-  this.el.addClass('hide');
+  this.el.addClass('ui-hide');
   if (this._effect) {
     setTimeout(function(){
       self.remove();
@@ -393,7 +393,7 @@ Dialog.prototype.remove = function(){
   return this;
 };
 
-})(ui, "<div id=\"dialog\" class=\"dialog hide\">\r\n  <div class=\"content\">\r\n    <h1>Title</h1>\r\n    <a href=\"#\" class=\"close\">×</a>\r\n    <p>Message</p>\r\n  </div>\r\n</div>");
+})(ui, "<div id=\"dialog\" class=\"ui-dialog ui-hide\">\r\n  <div class=\"ui-content\">\r\n    <h1>Title</h1>\r\n    <a href=\"#\" class=\"ui-close\">×</a>\r\n    <p>Message</p>\r\n  </div>\r\n</div>");
 ;(function(exports, html){
 /**
  * Expose `Overlay`.
@@ -452,9 +452,9 @@ Overlay.prototype = new ui.Emitter();
 
 Overlay.prototype.show = function(){
   this.emit('show');
-  this.el.removeClass('hide');
+  this.el.removeClass('ui-hide');
   // Tag all root level non-overlay items as shadowed
-  $('body > *:not(#overlay):not(#dialog)').addClass('shadowed');
+  $('body > *:not(#overlay):not(#dialog)').addClass('ui-shadowed');
   return this;
 };
 
@@ -470,15 +470,15 @@ Overlay.prototype.show = function(){
 Overlay.prototype.hide = function(){
   var self = this;
   this.emit('hide');
-  this.el.addClass('hide');
-  $('.shadowed').removeClass('shadowed');
+  this.el.addClass('ui-hide');
+  $('.shadowed').removeClass('ui-shadowed');
   setTimeout(function(){
     self.el.remove();
   }, 2000);
   return this;
 };
 
-})(ui, "<div id=\"overlay\" class=\"hide\"></div>");
+})(ui, "<div id=\"overlay\" class=\"ui-hide\"></div>");
 ;(function(exports, html){
 /**
  * Expose `Confirmation`.
@@ -543,7 +543,7 @@ Confirmation.prototype = new ui.Dialog;
  */
 
 Confirmation.prototype.cancel = function(text){
-  this.el.find('.cancel').text(text);
+  this.el.find('.ui-cancel').text(text);
   return this;
 };
 
@@ -556,7 +556,7 @@ Confirmation.prototype.cancel = function(text){
  */
 
 Confirmation.prototype.ok = function(text){
-  this.el.find('.ok').text(text);
+  this.el.find('.ui-ok').text(text);
   return this;
 };
 
@@ -570,7 +570,7 @@ Confirmation.prototype.ok = function(text){
 
 Confirmation.prototype.show = function(fn){
   ui.Dialog.prototype.show.call(this);
-  this.el.find('.ok').focus();
+  this.el.find('.ui-ok').focus();
   this.callback = fn || function(){};
   return this;
 };
@@ -590,7 +590,7 @@ Confirmation.prototype.render = function(options){
   var self = this
     , actions = $(html);
 
-  this.el.addClass('confirmation');
+  this.el.addClass('ui-confirmation');
   this.el.append(actions);
 
   this.on('close', function(){
@@ -603,14 +603,14 @@ Confirmation.prototype.render = function(options){
     self.callback(false);
   });
 
-  actions.find('.cancel').click(function(e){
+  actions.find('.ui-cancel').click(function(e){
     e.preventDefault();
     self.emit('cancel');
     self.callback(false);
     self.hide();
   });
 
-  actions.find('.ok').click(function(e){
+  actions.find('.ui-ok').click(function(e){
     e.preventDefault();
     self.emit('ok');
     self.callback(true);
@@ -618,7 +618,7 @@ Confirmation.prototype.render = function(options){
   });
 };
 
-})(ui, "<div class=\"actions\">\r\n  <button class=\"cancel\">Cancel</button>\r\n  <button class=\"ok main\">Ok</button>\r\n</div>");
+})(ui, "<div class=\"ui-actions\">\r\n  <button class=\"ui-cancel\">Cancel</button>\r\n  <button class=\"ui-ok ui-main\">Ok</button>\r\n</div>");
 ;(function(exports, html){
 
 /**
@@ -684,9 +684,9 @@ Alert.prototype = new ui.Dialog();
  */
 
 Alert.prototype.cancel = function(text){
-  var cancel = this.el.find('.cancel');
+  var cancel = this.el.find('.ui-cancel');
   cancel.text(text);
-  cancel.removeClass('hide');
+  cancel.removeClass('ui-hide');
   return this;
 };
 
@@ -699,9 +699,9 @@ Alert.prototype.cancel = function(text){
  */
 
 Alert.prototype.ok = function(text){
-  var ok = this.el.find('.ok');
+  var ok = this.el.find('.ui-ok');
   ok.text(text);
-  ok.removeClass('hide');
+  ok.removeClass('ui-hide');
   return this;
 };
 
@@ -715,7 +715,7 @@ Alert.prototype.ok = function(text){
 
 Alert.prototype.show = function(fn){
   ui.Dialog.prototype.show.call(this);
-  this.el.find('.ok').focus();
+  this.el.find('.ui-ok').focus();
   this.callback = fn || function(){};
   return this;
 };
@@ -735,7 +735,7 @@ Alert.prototype.render = function(options){
   var self = this
     , actions = $(html);
 
-  this.el.addClass('alert');
+  this.el.addClass('ui-alert');
   this.el.append(actions);
 
   this.on('close', function(){
@@ -760,7 +760,7 @@ Alert.prototype.render = function(options){
 
 };
 
-})(ui, "<div class=\"actions\">\r\n  <button class=\"cancel hide\">Cancel</button>\r\n  <button class=\"ok main hide\">Ok</button>\r\n</div>");
+})(ui, "<div class=\"ui-actions\">\r\n  <button class=\"ui-cancel ui-hide\">Cancel</button>\r\n  <button class=\"ui-ok ui-main hide\">Ok</button>\r\n</div>");
 ;(function(exports, html){
 
 /**
@@ -811,8 +811,8 @@ function ColorPicker() {
   ui.Emitter.call(this);
   this._colorPos = {};
   this.el = $(html);
-  this.main = this.el.find('.main').get(0);
-  this.spectrum = this.el.find('.spectrum').get(0);
+  this.main = this.el.find('.ui-main').get(0);
+  this.spectrum = this.el.find('.ui-spectrum').get(0);
   $(this.main).bind('selectstart', function(e){ e.preventDefault() });
   $(this.spectrum).bind('selectstart', function(e){ e.preventDefault() });
   this.hue(rgb(255, 0, 0));
@@ -1113,7 +1113,7 @@ ColorPicker.prototype.renderMain = function(options){
   ctx.beginPath();
   ctx.restore();
 };
-})(ui, "<div class=\"color-picker\">\r\n  <canvas class=\"main\"></canvas>\r\n  <canvas class=\"spectrum\"></canvas>\r\n</div>");
+})(ui, "<div class=\"ui-color-picker\">\r\n  <canvas class=\"ui-main\"></canvas>\r\n  <canvas class=\"ui-spectrum\"></canvas>\r\n</div>");
 ;(function(exports, html){
 
 /**
@@ -1221,7 +1221,7 @@ Notification.prototype.render = function(options){
     , msg = options.message
     , self = this;
 
-  el.find('.close').click(function(){
+  el.find('.ui-close').click(function(){
     self.hide();
     return false;
   });
@@ -1242,7 +1242,7 @@ Notification.prototype.render = function(options){
   }
 
   setTimeout(function(){
-    el.removeClass('hide');
+    el.removeClass('ui-hide');
   }, 0);
 };
 
@@ -1254,7 +1254,7 @@ Notification.prototype.render = function(options){
  */
 
 Notification.prototype.closable = function(){
-  this.el.addClass('closable');
+  this.el.addClass('ui-closable');
   return this;
 };
 
@@ -1268,7 +1268,7 @@ Notification.prototype.closable = function(){
 
 Notification.prototype.effect = function(type){
   this._effect = type;
-  this.el.addClass(type);
+  this.el.addClass('ui-' + type);
   return this;
 };
 
@@ -1294,7 +1294,7 @@ Notification.prototype.show = function(){
 
 Notification.prototype.type = function(type){
   this._type = type;
-  this.el.addClass(type);
+  this.el.addClass('ui-' + type);
   return this;
 };
 
@@ -1332,7 +1332,7 @@ Notification.prototype.hide = function(ms){
   }
 
   // hide / remove
-  this.el.addClass('hide');
+  this.el.addClass('ui-hide');
   if (this._effect) {
     setTimeout(function(){
       self.remove();
@@ -1355,7 +1355,7 @@ Notification.prototype.remove = function(){
   this.el.remove();
   return this;
 };
-})(ui, "<li class=\"notification hide\">\r\n  <div class=\"content\">\r\n    <h1>Title</h1>\r\n    <a href=\"#\" class=\"close\">×</a>\r\n    <p>Message</p>\r\n  </div>\r\n</li>");
+})(ui, "<li class=\"ui-notification ui-hide\">\r\n  <div class=\"ui-content\">\r\n    <h1>Title</h1>\r\n    <a href=\"#\" class=\"ui-close\">×</a>\r\n    <p>Message</p>\r\n  </div>\r\n</li>");
 ;(function(exports, html){
 
 /**
@@ -1396,12 +1396,12 @@ SplitButton.prototype.events = function(){
   var self = this
     , el = this.el;
 
-  el.find('.button').click(function(e){
+  el.find('.ui-button').click(function(e){
     e.preventDefault();
     self.emit('click', e);
   });
 
-  el.find('.toggle').click(function(e){
+  el.find('.ui-toggle').click(function(e){
     e.preventDefault();
     self.toggle();
   });
@@ -1430,7 +1430,7 @@ SplitButton.prototype.toggle = function(){
 SplitButton.prototype.show = function(){
   this.state = 'visible';
   this.emit('show');
-  this.el.addClass('show');
+  this.el.addClass('ui-show');
   return this;
 };
 
@@ -1444,7 +1444,7 @@ SplitButton.prototype.show = function(){
 SplitButton.prototype.hide = function(){
   this.state = 'hidden';
   this.emit('hide');
-  this.el.removeClass('show');
+  this.el.removeClass('ui-show');
   return this;
 };
 
@@ -1458,7 +1458,7 @@ SplitButton.prototype.hide = function(){
 
 SplitButton.prototype.render = function(options){
   var options = options || {}
-    , button = this.el.find('.button')
+    , button = this.el.find('.ui-button')
     , label = options.label;
 
   if ('string' == label) button.text(label);
@@ -1466,7 +1466,7 @@ SplitButton.prototype.render = function(options){
   return this;
 };
 
-})(ui, "<div class=\"split-button\">\r\n  <a class=\"text\" href=\"#\">Action</a>\r\n  <a class=\"toggle\" href=\"#\"><span></span></a>\r\n</div>");
+})(ui, "<div class=\"ui-split-button\">\r\n  <a class=\"ui-text\" href=\"#\">Action</a>\r\n  <a class=\"ui-toggle\" href=\"#\"><span></span></a>\r\n</div>");
 ;(function(exports, html){
 
 /**
@@ -1522,7 +1522,7 @@ Menu.prototype = new ui.Emitter;
  */
 
 Menu.prototype.deselect = function(){
-  this.el.find('.selected').removeClass('selected');
+  this.el.find('.ui-selected').removeClass('ui-selected');
 };
 
 /**
@@ -1576,15 +1576,15 @@ Menu.prototype.onkeydown = function(e){
  */
 
 Menu.prototype.move = function(direction){
-  var prev = this.el.find('.selected').eq(0);
+  var prev = this.el.find('.ui-selected').eq(0);
 
   var next = prev.length
     ? prev[direction]()
     : this.el.find('li:first-child');
 
   if (next.length) {
-    prev.removeClass('selected');
-    next.addClass('selected');
+    prev.removeClass('ui-selected');
+    next.addClass('ui-selected');
     next.find('a').focus();
   }
 };
@@ -1606,7 +1606,7 @@ Menu.prototype.move = function(direction){
 Menu.prototype.add = function(text, fn){
   var self = this
     , el = $('<li><a href="#">' + text + '</a></li>')
-    .addClass(slug(text))
+    .addClass('ui-' + slug(text))
     .appendTo(this.el)
     .click(function(e){
       e.preventDefault();
@@ -1707,7 +1707,7 @@ function slug(str) {
     .replace(/[^a-z0-9-]/g, '');
 }
 
-})(ui, "<div class=\"menu\">\r\n</div>");
+})(ui, "<div class=\"ui-menu\">\r\n</div>");
 ;(function(exports, html){
 
 /**
@@ -1791,7 +1791,7 @@ Card.prototype.back = function(val){
 
 Card.prototype.flip = function(){
   this.emit('flip');
-  this.el.toggleClass('flipped');
+  this.el.toggleClass('ui-flipped');
   return this;
 };
 
@@ -1804,7 +1804,7 @@ Card.prototype.flip = function(){
  */
 
 Card.prototype.effect = function(type){
-  this.el.addClass(type);
+  this.el.addClass('ui-' + type);
   return this;
 };
 
@@ -1818,13 +1818,13 @@ Card.prototype.effect = function(type){
 Card.prototype.render = function(options){
   var self = this
     , el = this.el = $(this.template);
-  el.find('.front').empty().append(this._front.el || $(this._front));
-  el.find('.back').empty().append(this._back.el || $(this._back));
+  el.find('.ui-front').empty().append(this._front.el || $(this._front));
+  el.find('.ui-back').empty().append(this._back.el || $(this._back));
   el.click(function(){
     self.flip();
   });
 };
-})(ui, "<div class=\"card\">\r\n  <div class=\"wrapper\">\r\n    <div class=\"face front\">1</div>\r\n    <div class=\"face back\">2</div>\r\n  </div>\r\n</div>");
+})(ui, "<div class=\"ui-card\">\r\n  <div class=\"ui-wrapper\">\r\n    <div class=\"ui-face ui-front\">1</div>\r\n    <div class=\"ui-face ui-back\">2</div>\r\n  </div>\r\n</div>");
 ;(function(exports, html){
 /**
  * Tabs.
@@ -1897,9 +1897,9 @@ Tabs.prototype.render = function(options){
   var tabContainers = $(tabs.toArray().map(getTabTarget).join(', '));
 
   // Add CSS classes
-  el.addClass('tabs');
-  tabs.addClass('tab');
-  tabContainers.addClass('tab-container');
+  el.addClass('ui-tabs');
+  tabs.addClass('ui-tab');
+  tabContainers.addClass('ui-tab-container');
 
   // Listen for tab clicks
   tabs.click(function(e) {
@@ -1919,9 +1919,9 @@ Tabs.prototype.render = function(options){
 
 Tabs.prototype.selectTab = function(el) {
   // Set tab as selected
-  this.el.find('li.selected').removeClass('selected');
+  this.el.find('li.ui-selected').removeClass('ui-selected');
   this.selectedEl = $(el);
-  this.selectedEl.addClass('selected');
+  this.selectedEl.addClass('ui-selected');
 
   // Show relevant tab content
   hideAllTabs(this.el);
@@ -2017,10 +2017,10 @@ InteractiveDialog.prototype = new ui.Dialog();
  */
 
 InteractiveDialog.prototype.cancel = function(selector){
-  var cancel = this.el.find('.cancel');
+  var cancel = this.el.find('.ui-cancel');
   if (cancel.length > 0) { cancel.replaceWith(selector); }
   else { cancel = this.el.find(selector); }
-  cancel.addClass('cancel').removeClass('hide');
+  cancel.addClass('ui-cancel').removeClass('ui-hide');
   return this;
 };
 
@@ -2033,10 +2033,10 @@ InteractiveDialog.prototype.cancel = function(selector){
  */
 
 InteractiveDialog.prototype.ok = function(selector){
-  var ok = this.el.find('.ok');
+  var ok = this.el.find('.ui-ok');
   if (ok.length > 0) { ok.replaceWith(selector); }
   else { ok = this.el.find(selector); }
-  ok.addClass('ok').removeClass('hide');
+  ok.addClass('ui-ok').removeClass('ui-hide');
   return this;
 };
 
@@ -2067,7 +2067,7 @@ InteractiveDialog.prototype.render = function(options){
   var self = this
     , actions = $(html);
 
-  this.el.addClass('interactive');
+  this.el.addClass('ui-interactive');
   this.el.append(actions);
 
   // Move actions to outer parent if present
