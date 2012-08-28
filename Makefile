@@ -10,7 +10,8 @@ COMPONENTS = emitter \
   menu \
   card \
   tabs \
-  interactivedialog
+  interactivedialog \
+  select
 
 ui:
 	@rm -fr build
