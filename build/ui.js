@@ -1,6 +1,7 @@
 var ui = {};
 if (module && module.exports) { module.exports = ui; }
 
+
 ;(function(exports){
 /**
  * Expose `Emitter`.
@@ -127,6 +128,7 @@ Emitter.prototype.emit = function(event){
 
 
 })(ui);
+
 ;(function(exports, html){
 /**
  * Active dialog.
@@ -394,6 +396,7 @@ Dialog.prototype.remove = function(){
 };
 
 })(ui, "<div id=\"ui-dialog\" class=\"ui-dialog ui-hide\">\r\n  <div class=\"ui-content\">\r\n    <h1>Title</h1>\r\n    <a href=\"#\" class=\"ui-close\">×</a>\r\n    <p>Message</p>\r\n  </div>\r\n</div>");
+
 ;(function(exports, html){
 /**
  * Expose `Overlay`.
@@ -479,6 +482,7 @@ Overlay.prototype.hide = function(){
 };
 
 })(ui, "<div id=\"ui-overlay\" class=\"ui-hide\"></div>");
+
 ;(function(exports, html){
 /**
  * Expose `Confirmation`.
@@ -619,6 +623,7 @@ Confirmation.prototype.render = function(options){
 };
 
 })(ui, "<div class=\"ui-actions\">\r\n  <button class=\"ui-cancel\">Cancel</button>\r\n  <button class=\"ui-ok ui-main\">Ok</button>\r\n</div>");
+
 ;(function(exports, html){
 
 /**
@@ -761,6 +766,7 @@ Alert.prototype.render = function(options){
 };
 
 })(ui, "<div class=\"ui-actions\">\r\n  <button class=\"ui-cancel ui-hide\">Cancel</button>\r\n  <button class=\"ui-ok ui-main ui-hide\">Ok</button>\r\n</div>");
+
 ;(function(exports, html){
 
 /**
@@ -1114,6 +1120,7 @@ ColorPicker.prototype.renderMain = function(options){
   ctx.restore();
 };
 })(ui, "<div class=\"ui-color-picker\">\r\n  <canvas class=\"ui-main\"></canvas>\r\n  <canvas class=\"ui-spectrum\"></canvas>\r\n</div>");
+
 ;(function(exports, html){
 
 /**
@@ -1356,6 +1363,7 @@ Notification.prototype.remove = function(){
   return this;
 };
 })(ui, "<li class=\"ui-notification ui-hide\">\r\n  <div class=\"ui-content\">\r\n    <h1>Title</h1>\r\n    <a href=\"#\" class=\"ui-close\">×</a>\r\n    <p>Message</p>\r\n  </div>\r\n</li>");
+
 ;(function(exports, html){
 
 /**
@@ -1467,6 +1475,7 @@ SplitButton.prototype.render = function(options){
 };
 
 })(ui, "<div class=\"ui-split-button\">\r\n  <a class=\"ui-text\" href=\"#\">Action</a>\r\n  <a class=\"ui-toggle\" href=\"#\"><span></span></a>\r\n</div>");
+
 ;(function(exports, html){
 
 /**
@@ -1708,6 +1717,7 @@ function slug(str) {
 }
 
 })(ui, "<div class=\"ui-menu\">\r\n</div>");
+
 ;(function(exports, html){
 
 /**
@@ -1825,6 +1835,7 @@ Card.prototype.render = function(options){
   });
 };
 })(ui, "<div class=\"ui-card\">\r\n  <div class=\"ui-wrapper\">\r\n    <div class=\"ui-face ui-front\">1</div>\r\n    <div class=\"ui-face ui-back\">2</div>\r\n  </div>\r\n</div>");
+
 ;(function(exports, html){
 /**
  * Tabs.
@@ -1952,6 +1963,7 @@ var getTabTarget = function(el) {
 };
 
 })(ui, "");
+
 ;(function(exports, html){
 
 /**
@@ -2113,4 +2125,125 @@ InteractiveDialog.prototype.render = function(options){
   }.bind(this));
 };
 
+})(ui, "");
+
+;(function(exports, html){
+
+/**
+ * Initialize a new `Select`
+ * with an optional `label`.
+ *
+ * @param {String} label
+ * @api public
+ */
+
+function Select(namespace, label) {
+  ui.Emitter.call(this);
+
+  this.btn = new namespace.SplitButton(label);
+  this.btn.el.find('.ui-text').text(label);
+  this.el = this.btn.el
+    .addClass('ui-select');
+  this.menu = new namespace.menu();
+  this.menu.el.appendTo('body');
+  this.onChange = function(){};
+
+  // Carry over functions
+  this.remove = this.menu.remove;
+  this.has = this.menu.has;
+
+  // On click
+  this.el.click(function(e) {
+    var p = this.el.offset();
+    this.menu.moveTo(p.left, p.top + this.el.outerHeight()).show();
+    this.menu.el.css('width', this.el.outerWidth() + 'px');
+    return false;
+  }.bind(this));
+
+  this.show();
+}
+
+/**
+ * Expose `Select`.
+ */
+
+exports.Select = Select;
+
+/**
+ * Inherit from `Emitter.prototype`.
+ */
+
+Select.prototype = new ui.Emitter();
+
+/**
+ * Add a menu item(s)
+ * @return {Select}
+ * @api public
+ */
+Select.prototype.add = function(o) {
+
+    // Handler for determing if a value actually changed
+    var itemClick = function(item) {
+        return function() {
+          var label = this.el.find('.ui-text');
+          if (label.text() !== item) {
+              if (typeof this.onChange === 'function') {
+                  this.onChange(item);
+                  label.text(item);
+              }
+          }
+        }.bind(this);
+    }.bind(this);
+
+    // Add by array or single item
+    if (Array.isArray(o)) {
+        o.forEach(function(item){
+            this.menu.add(item, itemClick(item));
+        }.bind(this));
+    } else {
+        this.menu.add(o, itemClick(item));
+    }
+    return this;
+};
+
+
+/**
+ * Show the drop-down contents.
+ *
+ * @return {Select}
+ * @api public
+ */
+
+Select.prototype.show = function(){
+  this.state = 'visible';
+  this.emit('show');
+  this.el.addClass('ui-show');
+  return this;
+};
+
+/**
+ * Hide the drop-down contents.
+ *
+ * @return {Select}
+ * @api public
+ */
+
+Select.prototype.hide = function(){
+  this.state = 'hidden';
+  this.emit('hide');
+  this.el.removeClass('ui-show');
+  return this;
+};
+
+/**
+ * Assign a callback for when things change
+ *
+ * @return {Select}
+ * @api public
+ */
+
+Select.prototype.change = function(cb){
+  this.onChange = cb;
+  return this;
+};
 })(ui, "");
