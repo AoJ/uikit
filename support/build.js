@@ -88,7 +88,7 @@ function build(name, fn) {
 
 function append(file, str, fn) {
   fs.createWriteStream(file, { flags: 'a' })
-    .write(str);
+    .write('\n' + str);
   fn && fn();
 }
 
