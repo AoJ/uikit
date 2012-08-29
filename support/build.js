@@ -32,6 +32,7 @@ function next(i) {
 
 console.log();
 js.write('var ui = {};\n');
+js.write('if (module && module.exports) { module.exports = ui; }\n');
 next(0);
 process.on('exit', function(){
   console.log();
@@ -74,6 +75,8 @@ function build(name, fn) {
   var css = path.join(lib, name, name + '.css');
   if (path.existsSync(css)) {
     read(css, function(css){
+      css = css.replace(/\.([a-z]+)/g, '.ui-$1');
+      css = css.replace(/#(\w+)(?=[\s\.])/g, '#ui-$1');
       append('build/ui.css', css);
     });
   }
@@ -85,7 +88,7 @@ function build(name, fn) {
 
 function append(file, str, fn) {
   fs.createWriteStream(file, { flags: 'a' })
-    .write(str);
+    .write('\n' + str);
   fn && fn();
 }
 

@@ -1,4 +1,6 @@
 var ui = {};
+if (module && module.exports) { module.exports = ui; }
+
 
 ;(function(exports){
 /**
@@ -9,12 +11,24 @@ exports.Emitter = Emitter;
 
 /**
  * Initialize a new `Emitter`.
- * 
+ *
  * @api public
  */
 
 function Emitter() {
   this.callbacks = {};
+}
+
+/**
+ * Bind a given context to all callback functions, overriding the default "this"
+ * @param  {Object} The context which will be bound on callback function
+ * @return {Emitter}
+ * @api public
+  */
+
+Emitter.prototype.context = function(c) {
+  this.context = c;
+  return this;
 };
 
 /**
@@ -27,8 +41,16 @@ function Emitter() {
  */
 
 Emitter.prototype.on = function(event, fn){
-  (this.callbacks[event] = this.callbacks[event] || [])
-    .push(fn);
+  var addCallback = function(ev, cb){ (this.callbacks[ev] = this.callbacks[ev] || []).push(cb); }.bind(this);
+  if (typeof event === 'string') {
+    addCallback(event, fn);
+  } else if (typeof event === 'object') {
+    for (var key in event) {
+      if (event.hasOwnProperty(key)) {
+        addCallback(key, event[key]);
+      }
+    }
+  }
   return this;
 };
 
@@ -85,7 +107,7 @@ Emitter.prototype.off = function(event, fn){
  *
  * @param {String} event
  * @param {Mixed} ...
- * @return {Emitter} 
+ * @return {Emitter}
  */
 
 Emitter.prototype.emit = function(event){
@@ -94,16 +116,20 @@ Emitter.prototype.emit = function(event){
 
   if (callbacks) {
     for (var i = 0, len = callbacks.length; i < len; ++i) {
-      callbacks[i].apply(this, args);
+      var context = this.context || this;
+      if (typeof callbacks[i] === 'function') {
+        callbacks[i].apply(context, args);
+      }
     }
   }
 
   return this;
 };
 
-})(ui);
-;(function(exports, html){
 
+})(ui);
+
+;(function(exports, html){
 /**
  * Active dialog.
  */
@@ -117,7 +143,7 @@ var active;
 exports.Dialog = Dialog;
 
 /**
- * Return a new `Dialog` with the given 
+ * Return a new `Dialog` with the given
  * (optional) `title` and `msg`.
  *
  * @param {String} title or msg
@@ -161,13 +187,13 @@ function Dialog(options) {
   if (active && !active.hiding) active.hide();
   if (Dialog.effect) this.effect(Dialog.effect);
   active = this;
-};
+}
 
 /**
  * Inherit from `Emitter.prototype`.
  */
 
-Dialog.prototype = new ui.Emitter;
+Dialog.prototype = new ui.Emitter();
 
 /**
  * Render with the given `options`.
@@ -182,24 +208,24 @@ Dialog.prototype.render = function(options){
     , msg = options.message
     , self = this;
 
-  el.find('.close').click(function(){
+  el.find('.ui-close').click(function(){
     self.emit('close');
     self.hide();
     return false;
   });
 
-  el.find('h1').text(title);
+  el.find('h1').html(title);
   if (!title) el.find('h1').remove();
 
   // message
   if ('string' == typeof msg) {
-    el.find('p').text(msg);
+    el.find('p').html(msg);
   } else if (msg) {
     el.find('p').replaceWith(msg.el || msg);
   }
 
   setTimeout(function(){
-    el.removeClass('hide');
+    el.removeClass('ui-hide');
   }, 0);
 };
 
@@ -211,7 +237,7 @@ Dialog.prototype.render = function(options){
  */
 
 Dialog.prototype.closable = function(){
-  this.el.addClass('closable');
+  this.el.addClass('ui-closable');
   return this;
 };
 
@@ -225,7 +251,7 @@ Dialog.prototype.closable = function(){
 
 Dialog.prototype.effect = function(type){
   this._effect = type;
-  this.el.addClass(type);
+  this.el.addClass('ui-' + type);
   return this;
 };
 
@@ -250,12 +276,17 @@ Dialog.prototype.modal = function(){
 
 Dialog.prototype.overlay = function(){
   var self = this;
-  this._overlay = ui
-    .overlay({ closable: true })
-    .on('hide', function(){
-      self.closedOverlay = true;
-      self.hide();
-    });
+  var overlay = ui.overlay({ closable: true });
+
+  overlay.on('hide', function(){
+    self.closedOverlay = true;
+  });
+
+  overlay.on('close', function(){
+    self.emit('close');
+  });
+
+  this._overlay = overlay;
   return this;
 };
 
@@ -270,6 +301,7 @@ Dialog.prototype.escapable = function(){
   $(document).bind('keydown.dialog', function(e){
     if (27 != e.which) return;
     $(this).unbind('keydown.dialog');
+    self.emit('escape');
     self.hide();
   });
 };
@@ -286,21 +318,27 @@ Dialog.prototype.escapable = function(){
 Dialog.prototype.show = function(){
   var overlay = this._overlay;
 
-  this.emit('show');
-
   if (overlay) {
     overlay.show();
-    this.el.addClass('modal');
+    this.el.addClass('ui-modal');
   }
 
   // escape
   if (!overlay || overlay.closable) this.escapable();
 
   this.el.appendTo('body');
-  this.el.css({ marginLeft: -(this.el.width() / 2) + 'px' });
+
+  // Update centered position with window size changes
+  var updateSize = function() { this.el.css({ marginLeft: -(this.el.width() / 2) + 'px' }); }.bind(this);
+  $(window).resize(function() {
+    setTimeout(updateSize, 1);
+  });
+  setTimeout(updateSize, 0);
+
   this.emit('show');
   return this;
 };
+
 
 /**
  * Hide the dialog with optional delay of `ms`,
@@ -328,11 +366,11 @@ Dialog.prototype.hide = function(ms){
   }
 
   // hide / remove
-  this.el.addClass('hide');
+  this.el.addClass('ui-hide');
   if (this._effect) {
-    setTimeout(function(self){
+    setTimeout(function(){
       self.remove();
-    }, 500, this);
+    }, 500);
   } else {
     self.remove();
   }
@@ -353,12 +391,13 @@ Dialog.prototype.hide = function(ms){
 Dialog.prototype.remove = function(){
   this.emit('hide');
   this.el.remove();
+  $(document).unbind('keydown.dialog');
   return this;
 };
 
-})(ui, "<div id=\"dialog\" class=\"hide\">\n  <div class=\"content\">\n    <h1>Title</h1>\n    <a href=\"#\" class=\"close\">×</a>\n    <p>Message</p>\n  </div>\n</div>");
-;(function(exports, html){
+})(ui, "<div id=\"ui-dialog\" class=\"ui-dialog ui-hide\">\r\n  <div class=\"ui-content\">\r\n    <h1>Title</h1>\r\n    <a href=\"#\" class=\"ui-close\">×</a>\r\n    <p>Message</p>\r\n  </div>\r\n</div>");
 
+;(function(exports, html){
 /**
  * Expose `Overlay`.
  */
@@ -379,7 +418,7 @@ exports.overlay = function(options){
 
 /**
  * Initialize a new `Overlay`.
- *
+ *.prototype.overlay
  * @param {Object} options
  * @api public
  */
@@ -393,6 +432,7 @@ function Overlay(options) {
   this.el.appendTo('body');
   if (this.closable) {
     this.el.click(function(){
+      self.emit('close');
       self.hide();
     });
   }
@@ -402,7 +442,7 @@ function Overlay(options) {
  * Inherit from `Emitter.prototype`.
  */
 
-Overlay.prototype = new ui.Emitter;
+Overlay.prototype = new ui.Emitter();
 
 /**
  * Show the overlay.
@@ -415,7 +455,9 @@ Overlay.prototype = new ui.Emitter;
 
 Overlay.prototype.show = function(){
   this.emit('show');
-  this.el.removeClass('hide');
+  this.el.removeClass('ui-hide');
+  // Tag all root level non-overlay items as shadowed
+  $('body > *:not(#overlay):not(#dialog)').addClass('ui-shadowed');
   return this;
 };
 
@@ -431,16 +473,17 @@ Overlay.prototype.show = function(){
 Overlay.prototype.hide = function(){
   var self = this;
   this.emit('hide');
-  this.el.addClass('hide');
+  this.el.addClass('ui-hide');
+  $('.shadowed').removeClass('ui-shadowed');
   setTimeout(function(){
     self.el.remove();
   }, 2000);
   return this;
 };
 
-})(ui, "<div id=\"overlay\" class=\"hide\"></div>");
-;(function(exports, html){
+})(ui, "<div id=\"ui-overlay\" class=\"ui-hide\"></div>");
 
+;(function(exports, html){
 /**
  * Expose `Confirmation`.
  */
@@ -504,7 +547,7 @@ Confirmation.prototype = new ui.Dialog;
  */
 
 Confirmation.prototype.cancel = function(text){
-  this.el.find('.cancel').text(text);
+  this.el.find('.ui-cancel').text(text);
   return this;
 };
 
@@ -517,7 +560,7 @@ Confirmation.prototype.cancel = function(text){
  */
 
 Confirmation.prototype.ok = function(text){
-  this.el.find('.ok').text(text);
+  this.el.find('.ui-ok').text(text);
   return this;
 };
 
@@ -531,7 +574,7 @@ Confirmation.prototype.ok = function(text){
 
 Confirmation.prototype.show = function(fn){
   ui.Dialog.prototype.show.call(this);
-  this.el.find('.ok').focus();
+  this.el.find('.ui-ok').focus();
   this.callback = fn || function(){};
   return this;
 };
@@ -551,12 +594,159 @@ Confirmation.prototype.render = function(options){
   var self = this
     , actions = $(html);
 
-  this.el.addClass('confirmation');
+  this.el.addClass('ui-confirmation');
   this.el.append(actions);
 
   this.on('close', function(){
     self.emit('cancel');
     self.callback(false);
+  });
+
+  this.on('escape', function(){
+    self.emit('cancel');
+    self.callback(false);
+  });
+
+  actions.find('.ui-cancel').click(function(e){
+    e.preventDefault();
+    self.emit('cancel');
+    self.callback(false);
+    self.hide();
+  });
+
+  actions.find('.ui-ok').click(function(e){
+    e.preventDefault();
+    self.emit('ok');
+    self.callback(true);
+    self.hide();
+  });
+};
+
+})(ui, "<div class=\"ui-actions\">\r\n  <button class=\"ui-cancel\">Cancel</button>\r\n  <button class=\"ui-ok ui-main\">Ok</button>\r\n</div>");
+
+;(function(exports, html){
+
+/**
+ * Expose `Alert`.
+ */
+
+exports.Alert = Alert;
+
+/**
+ * Return a new `Alert` dialog with the given
+ * `title` and `msg`.
+ *
+ * @param {String} title or msg
+ * @param {String} msg
+ * @return {Dialog}
+ * @api public
+ */
+
+exports.alert = function(title, msg){
+  switch (arguments.length) {
+    case 2:
+      return new Alert({ title: title, message: msg });
+    case 1:
+      return new Alert({ message: title });
+  }
+};
+
+/**
+ * Initialize a new `Alert` dialog.
+ *
+ * Options:
+ *
+ *    - `title` dialog title
+ *    - `message` a message to display
+ *
+ * Emits:
+ *
+ *    - `cancel` the user pressed cancel or closed the dialog
+ *    - `ok` the user clicked ok
+ *    - `show` when visible
+ *    - `hide` when hidden
+ *
+ * @param {Object} options
+ * @api public
+ */
+
+function Alert(options) {
+  ui.Dialog.call(this, options);
+}
+
+/**
+ * Inherit from `Dialog.prototype`.
+ */
+
+Alert.prototype = new ui.Dialog();
+
+/**
+ * Change "cancel" button `text`.
+ *
+ * @param {String} text
+ * @return {Alert}
+ * @api public
+ */
+
+Alert.prototype.cancel = function(text){
+  var cancel = this.el.find('.ui-cancel');
+  cancel.text(text);
+  cancel.removeClass('ui-hide');
+  return this;
+};
+
+/**
+ * Change "ok" button `text`.
+ *
+ * @param {String} text
+ * @return {Alert}
+ * @api public
+ */
+
+Alert.prototype.ok = function(text){
+  var ok = this.el.find('.ui-ok');
+  ok.text(text);
+  ok.removeClass('ui-hide');
+  return this;
+};
+
+/**
+ * Show the confirmation dialog and invoke `fn(ok)`.
+ *
+ * @param {Function} fn
+ * @return {Alert} for chaining
+ * @api public
+ */
+
+Alert.prototype.show = function(fn){
+  ui.Dialog.prototype.show.call(this);
+  this.el.find('.ui-ok').focus();
+  this.callback = fn || function(){};
+  return this;
+};
+
+/**
+ * Render with the given `options`.
+ *
+ * Emits "cancel" event.
+ * Emits "ok" event.
+ *
+ * @param {Object} options
+ * @api public
+ */
+
+Alert.prototype.render = function(options){
+  ui.Dialog.prototype.render.call(this, options);
+  var self = this
+    , actions = $(html);
+
+  this.el.addClass('ui-alert');
+  this.el.append(actions);
+
+  this.on('close', function(){
+    self.emit('cancel');
+    self.callback(false);
+    self.hide();
   });
 
   actions.find('.cancel').click(function(e){
@@ -572,9 +762,11 @@ Confirmation.prototype.render = function(options){
     self.callback(true);
     self.hide();
   });
+
 };
 
-})(ui, "<div class=\"actions\">\n  <button class=\"cancel\">Cancel</button>\n  <button class=\"ok main\">Ok</button>\n</div>");
+})(ui, "<div class=\"ui-actions\">\r\n  <button class=\"ui-cancel ui-hide\">Cancel</button>\r\n  <button class=\"ui-ok ui-main ui-hide\">Ok</button>\r\n</div>");
+
 ;(function(exports, html){
 
 /**
@@ -625,8 +817,8 @@ function ColorPicker() {
   ui.Emitter.call(this);
   this._colorPos = {};
   this.el = $(html);
-  this.main = this.el.find('.main').get(0);
-  this.spectrum = this.el.find('.spectrum').get(0);
+  this.main = this.el.find('.ui-main').get(0);
+  this.spectrum = this.el.find('.ui-spectrum').get(0);
   $(this.main).bind('selectstart', function(e){ e.preventDefault() });
   $(this.spectrum).bind('selectstart', function(e){ e.preventDefault() });
   this.hue(rgb(255, 0, 0));
@@ -927,7 +1119,8 @@ ColorPicker.prototype.renderMain = function(options){
   ctx.beginPath();
   ctx.restore();
 };
-})(ui, "<div class=\"color-picker\">\n  <canvas class=\"main\"></canvas>\n  <canvas class=\"spectrum\"></canvas>\n</div>");
+})(ui, "<div class=\"ui-color-picker\">\r\n  <canvas class=\"ui-main\"></canvas>\r\n  <canvas class=\"ui-spectrum\"></canvas>\r\n</div>");
+
 ;(function(exports, html){
 
 /**
@@ -945,7 +1138,7 @@ exports.Notification = Notification;
 // list
 
 $(function(){
-  list = $('<ul id="notifications">');
+  list = $('<ul id="ui-notifications">');
   list.appendTo('body');
 })
 
@@ -1035,7 +1228,7 @@ Notification.prototype.render = function(options){
     , msg = options.message
     , self = this;
 
-  el.find('.close').click(function(){
+  el.find('.ui-close').click(function(){
     self.hide();
     return false;
   });
@@ -1056,7 +1249,7 @@ Notification.prototype.render = function(options){
   }
 
   setTimeout(function(){
-    el.removeClass('hide');
+    el.removeClass('ui-hide');
   }, 0);
 };
 
@@ -1068,7 +1261,7 @@ Notification.prototype.render = function(options){
  */
 
 Notification.prototype.closable = function(){
-  this.el.addClass('closable');
+  this.el.addClass('ui-closable');
   return this;
 };
 
@@ -1082,7 +1275,7 @@ Notification.prototype.closable = function(){
 
 Notification.prototype.effect = function(type){
   this._effect = type;
-  this.el.addClass(type);
+  this.el.addClass('ui-' + type);
   return this;
 };
 
@@ -1108,7 +1301,7 @@ Notification.prototype.show = function(){
 
 Notification.prototype.type = function(type){
   this._type = type;
-  this.el.addClass(type);
+  this.el.addClass('ui-' + type);
   return this;
 };
 
@@ -1146,11 +1339,11 @@ Notification.prototype.hide = function(ms){
   }
 
   // hide / remove
-  this.el.addClass('hide');
+  this.el.addClass('ui-hide');
   if (this._effect) {
-    setTimeout(function(self){
+    setTimeout(function(){
       self.remove();
-    }, 500, this);
+    }, 500);
   } else {
     self.remove();
   }
@@ -1169,7 +1362,8 @@ Notification.prototype.remove = function(){
   this.el.remove();
   return this;
 };
-})(ui, "<li class=\"notification hide\">\n  <div class=\"content\">\n    <h1>Title</h1>\n    <a href=\"#\" class=\"close\">×</a>\n    <p>Message</p>\n  </div>\n</li>");
+})(ui, "<li class=\"ui-notification ui-hide\">\r\n  <div class=\"ui-content\">\r\n    <h1>Title</h1>\r\n    <a href=\"#\" class=\"ui-close\">×</a>\r\n    <p>Message</p>\r\n  </div>\r\n</li>");
+
 ;(function(exports, html){
 
 /**
@@ -1210,12 +1404,12 @@ SplitButton.prototype.events = function(){
   var self = this
     , el = this.el;
 
-  el.find('.button').click(function(e){
+  el.find('.ui-button').click(function(e){
     e.preventDefault();
     self.emit('click', e);
   });
 
-  el.find('.toggle').click(function(e){
+  el.find('.ui-toggle').click(function(e){
     e.preventDefault();
     self.toggle();
   });
@@ -1244,7 +1438,7 @@ SplitButton.prototype.toggle = function(){
 SplitButton.prototype.show = function(){
   this.state = 'visible';
   this.emit('show');
-  this.el.addClass('show');
+  this.el.addClass('ui-show');
   return this;
 };
 
@@ -1258,7 +1452,7 @@ SplitButton.prototype.show = function(){
 SplitButton.prototype.hide = function(){
   this.state = 'hidden';
   this.emit('hide');
-  this.el.removeClass('show');
+  this.el.removeClass('ui-show');
   return this;
 };
 
@@ -1272,7 +1466,7 @@ SplitButton.prototype.hide = function(){
 
 SplitButton.prototype.render = function(options){
   var options = options || {}
-    , button = this.el.find('.button')
+    , button = this.el.find('.ui-button')
     , label = options.label;
 
   if ('string' == label) button.text(label);
@@ -1280,7 +1474,8 @@ SplitButton.prototype.render = function(options){
   return this;
 };
 
-})(ui, "<div class=\"split-button\">\n  <a class=\"button\" href=\"#\">Action</a>\n  <a class=\"toggle\" href=\"#\"><span></span></a>\n</div>");
+})(ui, "<div class=\"ui-split-button\">\r\n  <a class=\"ui-text\" href=\"#\">Action</a>\r\n  <a class=\"ui-toggle\" href=\"#\"><span></span></a>\r\n</div>");
+
 ;(function(exports, html){
 
 /**
@@ -1297,7 +1492,7 @@ exports.Menu = Menu;
  */
 
 exports.menu = function(){
-  return new Menu();
+  return new Menu;
 };
 
 /**
@@ -1336,7 +1531,7 @@ Menu.prototype = new ui.Emitter;
  */
 
 Menu.prototype.deselect = function(){
-  this.el.find('.selected').removeClass('selected');
+  this.el.find('.ui-selected').removeClass('ui-selected');
 };
 
 /**
@@ -1390,15 +1585,15 @@ Menu.prototype.onkeydown = function(e){
  */
 
 Menu.prototype.move = function(direction){
-  var prev = this.el.find('.selected').eq(0);
+  var prev = this.el.find('.ui-selected').eq(0);
 
   var next = prev.length
     ? prev[direction]()
     : this.el.find('li:first-child');
 
   if (next.length) {
-    prev.removeClass('selected');
-    next.addClass('selected');
+    prev.removeClass('ui-selected');
+    next.addClass('ui-selected');
     next.find('a').focus();
   }
 };
@@ -1420,7 +1615,7 @@ Menu.prototype.move = function(direction){
 Menu.prototype.add = function(text, fn){
   var self = this
     , el = $('<li><a href="#">' + text + '</a></li>')
-    .addClass(slug(text))
+    .addClass('ui-' + slug(text))
     .appendTo(this.el)
     .click(function(e){
       e.preventDefault();
@@ -1521,7 +1716,8 @@ function slug(str) {
     .replace(/[^a-z0-9-]/g, '');
 }
 
-})(ui, "<div class=\"menu\">\n</div>");
+})(ui, "<div class=\"ui-menu\">\r\n</div>");
+
 ;(function(exports, html){
 
 /**
@@ -1605,7 +1801,7 @@ Card.prototype.back = function(val){
 
 Card.prototype.flip = function(){
   this.emit('flip');
-  this.el.toggleClass('flipped');
+  this.el.toggleClass('ui-flipped');
   return this;
 };
 
@@ -1618,7 +1814,7 @@ Card.prototype.flip = function(){
  */
 
 Card.prototype.effect = function(type){
-  this.el.addClass(type);
+  this.el.addClass('ui-' + type);
   return this;
 };
 
@@ -1632,10 +1828,422 @@ Card.prototype.effect = function(type){
 Card.prototype.render = function(options){
   var self = this
     , el = this.el = $(this.template);
-  el.find('.front').empty().append(this._front.el || $(this._front));
-  el.find('.back').empty().append(this._back.el || $(this._back));
+  el.find('.ui-front').empty().append(this._front.el || $(this._front));
+  el.find('.ui-back').empty().append(this._back.el || $(this._back));
   el.click(function(){
     self.flip();
   });
 };
-})(ui, "<div class=\"card\">\n  <div class=\"wrapper\">\n    <div class=\"face front\">1</div>\n    <div class=\"face back\">2</div>\n  </div>\n</div>");
+})(ui, "<div class=\"ui-card\">\r\n  <div class=\"ui-wrapper\">\r\n    <div class=\"ui-face ui-front\">1</div>\r\n    <div class=\"ui-face ui-back\">2</div>\r\n  </div>\r\n</div>");
+
+;(function(exports, html){
+/**
+ * Tabs.
+ */
+
+
+
+/**
+ * Expose `Tabs`.
+ */
+
+exports.Tabs = Tabs;
+
+/**
+ * Return a new `Tabs` with the given
+ * (optional) `title` and `msg`.
+ *
+ * @param {Object} selector or jQuery element
+ * @return {Tabs}
+ * @api public
+ */
+
+exports.tabs = function(tabs) {
+  tabs = $(tabs);
+  return new Tabs({ tabs: $(tabs) });
+};
+
+/**
+ * Initialize a new `Tabs`.
+ *
+ * Options:
+ *
+ *    - `parent` element that contains the tab <li>'s
+ *
+ * Emits:
+ *
+ *    - `show` when visible
+ *    - `hide` when hidden
+ *
+ * @param {Object} options
+ * @api public
+ */
+
+function Tabs(options) {
+  ui.Emitter.call(this);
+  options = options || {};
+
+  // Unused
+  this.template = html;
+  this.tabs = options.parent;
+  this.render(options);
+}
+
+/**
+ * Inherit from `Emitter.prototype`.
+ */
+
+Tabs.prototype = new ui.Emitter();
+
+/**
+ * Render with the given `options`.
+ *
+ * @param {Object} options
+ * @api public
+ */
+
+Tabs.prototype.render = function(options){
+  var el = this.el = options.tabs;
+  var tabs = el.find('li');
+  var tabContainers = $(tabs.toArray().map(getTabTarget).join(', '));
+
+  // Add CSS classes
+  el.addClass('ui-tabs');
+  tabs.addClass('ui-tab');
+  tabContainers.addClass('ui-tab-container');
+
+  // Listen for tab clicks
+  tabs.click(function(e) {
+    this.selectTab($(e.currentTarget));
+    e.preventDefault();
+  }.bind(this));
+
+  // Prep UI
+  hideAllTabs(this.el);
+  this.selectTab(el.find('li:first'));
+};
+
+/**
+ * Select the given tab
+ * @param  {Object} el - Select the given tab (selector or jQuery element)
+ */
+
+Tabs.prototype.selectTab = function(el) {
+  // Set tab as selected
+  this.el.find('li.ui-selected').removeClass('ui-selected');
+  this.selectedEl = $(el);
+  this.selectedEl.addClass('ui-selected');
+
+  // Show relevant tab content
+  hideAllTabs(this.el);
+  this.el.parent().find(getTabTarget(this.selectedEl)).show();
+
+  // Emite events
+  this.emit('tabchange');
+  $(window).resize();
+};
+
+
+//
+// Local utility methods
+
+var hideAllTabs = function(tabs) {
+  // Build list of selectors
+  var selectors = tabs.find('li').toArray().map(getTabTarget);
+  var parent = tabs.parent();
+  // Select all the tab areas and hide
+  parent.find(selectors.join(', ')).hide();
+};
+
+var getTabTarget = function(el) {
+  el = $(el);
+  var tabTarget = el.attr('data-tab-target');
+  if (!tabTarget) { tabTarget = el.attr('href'); }
+  return tabTarget;
+};
+
+})(ui, "");
+
+;(function(exports, html){
+
+/**
+ * Expose `InteractiveDialog`.
+ */
+
+exports.InteractiveDialog = InteractiveDialog;
+
+/**
+ * Return a new `InteractiveDialog` dialog with the given
+ * `title` and `msg`.
+ *
+ * @param {String} title or msg
+ * @param {String} msg
+ * @return {Dialog}
+ * @api public
+ */
+
+exports.interactiveDialog = function(title, msg){
+  switch (arguments.length) {
+    case 2:
+      return new InteractiveDialog({ title: title, message: msg });
+    case 1:
+      return new InteractiveDialog({ message: title });
+  }
+};
+
+/**
+ * Initialize a new `InteractiveDialog` dialog.
+ *
+ * Options:
+ *
+ *    - `title` dialog title
+ *    - `message` a message to display
+ *
+ * Emits:
+ *
+ *    - `cancel` the user pressed cancel or closed the dialog
+ *    - `ok` the user clicked ok
+ *    - `show` when visible
+ *    - `hide` when hidden
+ *
+ * @param {Object} options
+ * @api public
+ */
+
+function InteractiveDialog(options) {
+  ui.Dialog.call(this, options);
+}
+
+/**
+ * Inherit from `Dialog.prototype`.
+ */
+
+InteractiveDialog.prototype = new ui.Dialog();
+
+/**
+ * Change "cancel" button `selector`.
+ *
+ * @param {String} selector
+ * @return {InteractiveDialog}
+ * @api public
+ */
+
+InteractiveDialog.prototype.cancel = function(selector){
+  var cancel = this.el.find('.ui-cancel');
+  if (cancel.length > 0) { cancel.replaceWith(selector); }
+  else { cancel = this.el.find(selector); }
+  cancel.addClass('ui-cancel').removeClass('ui-hide');
+  return this;
+};
+
+/**
+ * Change "ok" button `selector`.
+ *
+ * @param {String} selector
+ * @return {InteractiveDialog}
+ * @api public
+ */
+
+InteractiveDialog.prototype.ok = function(selector){
+  var ok = this.el.find('.ui-ok');
+  if (ok.length > 0) { ok.replaceWith(selector); }
+  else { ok = this.el.find(selector); }
+  ok.addClass('ui-ok').removeClass('ui-hide');
+  return this;
+};
+
+/**
+ * Show the confirmation dialog and invoke `fn(ok)`.
+ *
+ * @param {Function} fn
+ * @return {InteractiveDialog} for chaining
+ * @api public
+ */
+
+InteractiveDialog.prototype.show = function(fn){
+  ui.Dialog.prototype.show.call(this);
+  this.el.find('.ok').focus();
+  this.callback = fn || function(){};
+  return this;
+};
+
+/**
+ * Render with the given `options`.
+ *
+ * @param {Object} options
+ * @api public
+ */
+
+InteractiveDialog.prototype.render = function(options){
+  ui.Dialog.prototype.render.call(this, options);
+  var self = this
+    , actions = $(html);
+
+  this.el.addClass('ui-interactive');
+  this.el.append(actions);
+
+  // Move actions to outer parent if present
+  this.el.find('.actions').appendTo(this.el);
+
+  // Cancel/close
+  var close = function() {
+    self.callback(false);
+    self.hide();
+  };
+
+  this.on('close', close);
+  this.el.on('click', '.cancel', function(e){
+    e.preventDefault();
+    self.emit('close');
+    close();
+  });
+
+  // OK
+  var ok = function() {
+    self.emit('ok');
+    self.emit('close');
+    self.callback(true);
+    self.hide();
+  }.bind(this);
+
+  this.el.on('click', '.ok', function(e){
+    e.preventDefault();
+    ok();
+  });
+
+  // "Ok" on enter
+  this.el.on('keydown', function (e) {
+    if(e.which === 13 || e.keyCode === 13){
+      ok();
+      e.preventDefault();
+    }
+  }.bind(this));
+
+  // Focus on first input element
+  setTimeout(function(){
+      this.el.find('input:first').focus();
+  }.bind(this));
+};
+
+})(ui, "");
+
+;(function(exports, html){
+
+/**
+ * Initialize a new `Select`
+ * with an optional `label`.
+ *
+ * @param {String} label
+ * @api public
+ */
+
+function Select(namespace, label) {
+  ui.Emitter.call(this);
+
+  this.btn = new namespace.SplitButton(label);
+  this.btn.el.find('.ui-text').text(label);
+  this.el = this.btn.el
+    .addClass('ui-select');
+  this.menu = new namespace.menu();
+  this.menu.el.appendTo('body');
+  this.onChange = function(){};
+
+  // Carry over functions
+  this.remove = this.menu.remove;
+  this.has = this.menu.has;
+
+  // On click
+  this.el.click(function(e) {
+    var p = this.el.offset();
+    this.menu.moveTo(p.left, p.top + this.el.outerHeight()).show();
+    this.menu.el.css('width', this.el.outerWidth() + 'px');
+    return false;
+  }.bind(this));
+
+  this.show();
+}
+
+/**
+ * Expose `Select`.
+ */
+
+exports.Select = Select;
+
+/**
+ * Inherit from `Emitter.prototype`.
+ */
+
+Select.prototype = new ui.Emitter();
+
+/**
+ * Add a menu item(s)
+ * @return {Select}
+ * @api public
+ */
+Select.prototype.add = function(o) {
+
+    // Handler for determing if a value actually changed
+    var itemClick = function(item) {
+        return function() {
+          var label = this.el.find('.ui-text');
+          if (label.text() !== item) {
+              if (typeof this.onChange === 'function') {
+                  this.onChange(item);
+                  label.text(item);
+              }
+          }
+        }.bind(this);
+    }.bind(this);
+
+    // Add by array or single item
+    if (Array.isArray(o)) {
+        o.forEach(function(item){
+            this.menu.add(item, itemClick(item));
+        }.bind(this));
+    } else {
+        this.menu.add(o, itemClick(item));
+    }
+    return this;
+};
+
+
+/**
+ * Show the drop-down contents.
+ *
+ * @return {Select}
+ * @api public
+ */
+
+Select.prototype.show = function(){
+  this.state = 'visible';
+  this.emit('show');
+  this.el.addClass('ui-show');
+  return this;
+};
+
+/**
+ * Hide the drop-down contents.
+ *
+ * @return {Select}
+ * @api public
+ */
+
+Select.prototype.hide = function(){
+  this.state = 'hidden';
+  this.emit('hide');
+  this.el.removeClass('ui-show');
+  return this;
+};
+
+/**
+ * Assign a callback for when things change
+ *
+ * @return {Select}
+ * @api public
+ */
+
+Select.prototype.change = function(cb){
+  this.onChange = cb;
+  return this;
+};
+})(ui, "");

@@ -1,4 +1,5 @@
-#dialog {
+
+.ui-dialog {
   position: fixed;
   left: 50%;
   top: 150px;
@@ -9,29 +10,37 @@
   z-index: 1000;
 }
 
-#dialog .content {
+.ui-dialog .ui-actions {
+  border-top: 1px solid #eee;
+  padding: 10px 30px;
+  text-align: right;
+  background: #fafafa;
+  box-shadow: inset 0 1px 0 white;
+}
+
+.ui-dialog .ui-content {
   padding: 15px 20px;
 }
 
-#dialog h1 {
+.ui-dialog h1 {
   margin: 0 0 5px 0;
   font-size: 16px;
   font-weight: normal;
 }
 
-#dialog p {
+.ui-dialog p {
   margin: 0;
   padding: 0;
   font-size: .9em;
 }
 
-#dialog.modal {
+.ui-dialog.ui-modal {
   box-shadow: 0 1px 8px 0 black;
 }
 
 /* close */
 
-#dialog .close {
+.ui-dialog .ui-close {
   position: absolute;
   top: 3px;
   right: 10px;
@@ -42,54 +51,55 @@
   display: none;
 }
 
-#dialog.closable .close {
+.ui-dialog.ui-closable .ui-close {
   display: block;
 }
 
-#dialog .close:hover {
+.ui-dialog .ui-close:hover {
   color: black;
 }
 
-#dialog .close:active {
+.ui-dialog .ui-close:active {
   margin-top: 1px;
 }
 
 /* slide */
 
-#dialog.slide {
+.ui-dialog.ui-slide {
   -webkit-transition: opacity 300ms, top 300ms;
   -moz-transition: opacity 300ms, top 300ms;
 }
 
-#dialog.slide.hide {
+.ui-dialog.ui-slide.ui-hide {
   opacity: 0;
   top: -500px;
 }
 
 /* fade */
 
-#dialog.fade {
+.ui-dialog.ui-fade {
   -webkit-transition: opacity 300ms;
   -moz-transition: opacity 300ms;
 }
 
-#dialog.fade.hide {
+.ui-dialog.ui-fade.ui-hide {
   opacity: 0;
 }
 
 /* scale */
 
-#dialog.scale {
+.ui-dialog.ui-scale {
   -webkit-transition: -webkit-transform 300ms;
   -moz-transition: -moz-transform 300ms;
   -webkit-transform: scale(1);
   -moz-transform: scale(1);
 }
 
-#dialog.scale.hide {
+.ui-dialog.ui-scale.ui-hide {
   -webkit-transform: scale(0);
   -moz-transform: scale(0);
-}#overlay {
+}
+#ui-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -101,34 +111,45 @@
   z-index: 500;
 }
 
-#overlay.hide {
+#ui-overlay.ui-hide {
   pointer-events: none;
   opacity: 0;
-}.confirmation .actions {
+}
+
+body > .ui-shadowed {
+  -webkit-filter: blur(3px) grayscale(0.5);
+  -webkit-transition: -webkit-filter 1s ease;
+}
+.ui-confirmation .ui-actions {
   border-top: 1px solid #eee;
   padding: 5px;
   text-align: right;
   background: #fafafa;
   box-shadow: inset 0 1px 0 white;
-}.color-picker canvas {
+}
+.ui-alert .ui-hide {
+    display: none
+}
+.ui-color-picker canvas {
   border: 1px solid #888;
 }
-.color-picker canvas:active {
+.ui-color-picker canvas:active {
   cursor: none;
 }
 
-#notifications {
+
+#ui-notifications {
   position: fixed;
   top: 10px;
   right: 15px;
 }
 
-#notifications li {
+#ui-notifications li {
   margin-bottom: 5px;
   list-style: none;
 }
 
-.notification {
+.ui-notification {
   position: relative;
   max-width: 600px;
   min-width: 250px;
@@ -137,23 +158,23 @@
   z-index: 100;
 }
 
-.notification .content {
+.ui-notification .ui-content {
   padding: 15px 20px;
 }
 
-.notification h1 {
+.ui-notification h1 {
   margin: 0 0 5px 0;
   font-size: 16px;
   font-weight: normal;
 }
 
-.notification p {
+.ui-notification p {
   margin: 0;
   padding: 0;
   font-size: .9em;
 }
 
-.notification .close {
+.ui-notification .ui-close {
   position: absolute;
   top: 5px;
   right: 10px;
@@ -162,21 +183,21 @@
   display: none;
 }
 
-.notification.closable .close {
+.ui-notification.ui-closable .ui-close {
   display: block;
 }
 
-.notification .close:hover {
+.ui-notification .ui-close:hover {
   color: black;
 }
 
-.notification .close:active {
+.ui-notification .ui-close:active {
   margin-top: 1px;
 }
 
 /* close */
 
-.notification .close {
+.ui-notification .ui-close {
   position: absolute;
   top: 3px;
   right: 10px;
@@ -189,45 +210,46 @@
 
 /* slide */
 
-.notification.slide {
+.ui-notification.ui-slide {
   -webkit-transition: opacity 300ms, top 300ms;
   -moz-transition: opacity 300ms, top 300ms;
 }
 
-.notification.slide.hide {
+.ui-notification.ui-slide.ui-hide {
   opacity: 0;
   top: -500px;
 }
 
 /* fade */
 
-.notification.fade {
+.ui-notification.ui-fade {
   -webkit-transition: opacity 300ms;
   -moz-transition: opacity 300ms;
 }
 
-.notification.fade.hide {
+.ui-notification.ui-fade.ui-hide {
   opacity: 0;
 }
 
 /* scale */
 
-.notification.scale {
+.ui-notification.ui-scale {
   -webkit-transition: -webkit-transform 300ms;
   -moz-transition: -moz-transform 300ms;
   -webkit-transform: scale(1);
   -moz-transform: scale(1);
 }
 
-.notification.scale.hide {
+.ui-notification.ui-scale.ui-hide {
   -webkit-transform: scale(0);
   -moz-transform: scale(0);
-}.split-button {
+}
+.ui-split-button {
   display: inline-block;
   border: 1px solid #eee;
 }
 
-.split-button a {
+.ui-split-button a {
   display: inline-block;
   float: left;
   height: 20px;
@@ -238,17 +260,18 @@
   -moz-user-select: none;
 }
 
-.split-button .toggle {
+.ui-split-button .ui-toggle {
   border-left: 1px solid #eee;
 }
 
-.split-button .toggle span {
+.ui-split-button .ui-toggle span {
   display: block;
   margin-top: 8px;
   border-left: 4px solid transparent;
   border-right: 4px solid transparent;
   border-top: 4px solid #888;
-}.menu {
+}
+.ui-menu {
   position: absolute;
   top: 0;
   left: 0;
@@ -259,11 +282,11 @@
   border: 1px solid rgba(0,0,0,0.2);
 }
 
-.menu li {
+.ui-menu li {
   list-style: none;
 }
 
-.menu li a {
+.ui-menu li a {
   display: block;
   padding: 5px 30px 5px 12px;
   text-decoration: none;
@@ -272,25 +295,26 @@
   outline: none;
 }
 
-.menu li:first-child a {
+.ui-menu li:first-child a {
   border-top: none;
 }
 
-.menu li a:hover,
-.menu li.selected a {
+.ui-menu li a:hover,
+.ui-menu li.ui-selected a {
   background: #f1faff;
 }
 
-/* from: http://desandro.github.com/3dtransforms */
 
-.card {
+/* from: http://desandro.ui-github.ui-com/3dtransforms */
+
+.ui-card {
   width: 200px;
   height: 260px;
   position: relative;
   perspective: 800;
 }
 
-.card .wrapper {
+.ui-card .ui-wrapper {
   width: 100%;
   height: 100%;
   position: absolute;
@@ -305,7 +329,7 @@
   -moz-box-shadow: inset 0 -1px 0 0 white, 0 1px 4px 0 #ddd;
 }
 
-.card .face {
+.ui-card .ui-face {
   display: block;
   position: absolute;
   width: 100%;
@@ -314,24 +338,59 @@
   -moz-backface-visibility: hidden;
 }
 
-.card .back {
+.ui-card .ui-back {
   -webkit-transform: rotateY(180deg);
   -moz-transform: rotateY(180deg);
 }
 
-.card.flipped .wrapper {
+.ui-card.ui-flipped .ui-wrapper {
   -webkit-transform: rotateY(180deg);
   -moz-transform: rotateY(180deg);
 }
 
 /* sideflip effect */
 
-.card.sideflip .wrapper {
+.ui-card.ui-sideflip .ui-wrapper {
   -webkit-transform-origin: right center;
   -moz-transform-origin: right center;
 }
 
-.card.sideflip.flipped .wrapper {
+.ui-card.ui-sideflip.ui-flipped .ui-wrapper {
   -webkit-transform: translateX(-100%) rotateY(180deg);
   -moz-transform: translateX(-100%) rotateY(180deg);
 }
+
+ul.ui-tabs {
+  border-bottom: 1px solid #eee;
+}
+
+li.ui-tab {
+  cursor: pointer;
+  border-top: 1px solid #eee;
+  border-left: 1px solid #eee;
+  display: inline-block;
+  line-height: 20px;
+  margin-left: 0;
+  margin-right: 0;
+  padding: 5px 10px;
+  text-decoration: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+}
+
+li.ui-selected {
+  font-weight: bold;
+}
+
+li.ui-tab:last-child {
+  border-right: 1px solid #eee;
+}
+
+
+.ui-dialog.ui-interactive {
+  max-width: 75%;
+  max-height: 75%;
+  top: 15%;
+}
+
+.ui-ui-select .ui-ui-text { padding: 2px 4px; font-size: 13px; }

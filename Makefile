@@ -3,11 +3,15 @@ COMPONENTS = emitter \
   dialog \
   overlay \
   confirmation \
+  alert \
   color-picker \
   notification \
   split-button \
   menu \
-  card
+  card \
+  tabs \
+  interactivedialog \
+  select
 
 ui:
 	@rm -fr build

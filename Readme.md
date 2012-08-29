@@ -3,15 +3,19 @@
 
   UIKit is a small (4kb minified / gzipped) collection of flexible, cohesive, decoupled components for the modern web. With an emphasis on structure-only styling making it simple to apply application specific styling. UIKit is _not_ a replacement for larger UI frameworks, nor is it a CSS framework such as Bootstrap. UIKit is still a work in progress, check the [Issues](https://github.com/visionmedia/uikit/issues).
 
-## Components
+#### You are now viewing the BlogFrog fork of uikit, which adds the following:
 
-  - [ui.Emitter](https://github.com/visionmedia/uikit/tree/master/lib/components/emitter/emitter.js) an event emitter used throughout various components
-  - [ui.Card](https://github.com/visionmedia/uikit/tree/master/lib/components/card/card.js) a double-sided "card" powered by 3d transforms
-  - [ui.ColorPicker](https://github.com/visionmedia/uikit/tree/master/lib/components/color-picker/color-picker.js) an elegant scalable color picker
-  - [ui.Overlay](https://github.com/visionmedia/uikit/tree/master/lib/components/overlay/overlay.js) an overlay used by `ui.Dialog`
-  - [ui.Dialog](https://github.com/visionmedia/uikit/tree/master/lib/components/dialog/dialog.js) a dialog component sporting optional modal and overlay functionality
-  - [ui.Confirmation](https://github.com/visionmedia/uikit/tree/master/lib/components/confirmation/confirmation.js) a confirmation dialog building on `ui.Dialog`
-  - [ui.Notification](https://github.com/visionmedia/uikit/tree/master/lib/components/notification/notification.js) an unobtrusive growl-like notification
+## New Components
+
+  - [ui.Alert](https://github.com/blogfrog/uikit/tree/master/lib/components/alert/alert.js) Alert, just like in javascript, but prettier.  [Pulled from witcraft](https://github.com/witcraft/uikit/commit/80c6bff7634e854cf6a1e3d7ef08d2462feeb82d)
+  - [ui.Tabs](https://github.com/blogfrog/uikit/tree/master/lib/components/tabs/tabs.js) a simple tab interface (requires HTML)
+  - [ui.InteractiveDialog](https://github.com/blogfrog/uikit/tree/master/lib/components/interactivedialog/interactivedialog.js) a wrapper for a higher level (and larger) dialog
+
+## New Features
+
+  - Set emitter context.  ie. `dialog.context(whatever)` means `dialog.on('event', function() { /* this === whatever */ })`
+  - `Emitter.on` accepts an object with event -> callback mappings for multiple binding
+  - uikit wrapped in `module.exports` for use in CommonJS applications
 
 ## Custom builds
 
@@ -21,15 +25,31 @@
   ![UIKit build](http://f.cl.ly/items/0Z040x2E2g2v2E1M2l38/Grab.png)
 
   You may specify the list of components to build, and their markup, styles, and javascript will be added to `./build/ui.{js,css}`:
-  
+
   ![UIKit custom build](http://f.cl.ly/items/1B3C3g293y03372I1q1b/Grab.png)
 
 ## Running tests
 
   Tests are run with Mocha, first install the node.js deps:
-  
+
       $ npm install
 
   Then run the tests:
-  
+
       $ make test
+
+## Tabs HTML
+
+The Tabs component requires a small bit of markup.
+
+#### Tabs
+
+    <ul>
+      <li href="#tab1">Tab Item 1</li>
+      <li data-tab-target=".second-tab">Tab Item 1</li>
+    </ul>
+
+#### Tab Containers
+
+    <div id="tab1"></div>
+    <div class="second-tab"></div>
