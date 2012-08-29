@@ -395,7 +395,7 @@ Dialog.prototype.remove = function(){
   return this;
 };
 
-})(ui, "<div id=\"ui-dialog\" class=\"ui-dialog ui-hide\">\r\n  <div class=\"ui-content\">\r\n    <h1>Title</h1>\r\n    <a href=\"#\" class=\"ui-close\">×</a>\r\n    <p>Message</p>\r\n  </div>\r\n</div>");
+})(ui, "<div id=\"ui-dialog\" class=\"ui-dialog ui-hide\">\n  <div class=\"ui-content\">\n    <h1>Title</h1>\n    <a href=\"#\" class=\"ui-close\">×</a>\n    <p>Message</p>\n  </div>\n</div>");
 
 ;(function(exports, html){
 /**
@@ -622,7 +622,7 @@ Confirmation.prototype.render = function(options){
   });
 };
 
-})(ui, "<div class=\"ui-actions\">\r\n  <button class=\"ui-cancel\">Cancel</button>\r\n  <button class=\"ui-ok ui-main\">Ok</button>\r\n</div>");
+})(ui, "<div class=\"ui-actions\">\n  <button class=\"ui-cancel\">Cancel</button>\n  <button class=\"ui-ok ui-main\">Ok</button>\n</div>");
 
 ;(function(exports, html){
 
@@ -765,7 +765,7 @@ Alert.prototype.render = function(options){
 
 };
 
-})(ui, "<div class=\"ui-actions\">\r\n  <button class=\"ui-cancel ui-hide\">Cancel</button>\r\n  <button class=\"ui-ok ui-main ui-hide\">Ok</button>\r\n</div>");
+})(ui, "<div class=\"ui-actions\">\n  <button class=\"ui-cancel ui-hide\">Cancel</button>\n  <button class=\"ui-ok ui-main ui-hide\">Ok</button>\n</div>");
 
 ;(function(exports, html){
 
@@ -1119,7 +1119,7 @@ ColorPicker.prototype.renderMain = function(options){
   ctx.beginPath();
   ctx.restore();
 };
-})(ui, "<div class=\"ui-color-picker\">\r\n  <canvas class=\"ui-main\"></canvas>\r\n  <canvas class=\"ui-spectrum\"></canvas>\r\n</div>");
+})(ui, "<div class=\"ui-color-picker\">\n  <canvas class=\"ui-main\"></canvas>\n  <canvas class=\"ui-spectrum\"></canvas>\n</div>");
 
 ;(function(exports, html){
 
@@ -1362,7 +1362,7 @@ Notification.prototype.remove = function(){
   this.el.remove();
   return this;
 };
-})(ui, "<li class=\"ui-notification ui-hide\">\r\n  <div class=\"ui-content\">\r\n    <h1>Title</h1>\r\n    <a href=\"#\" class=\"ui-close\">×</a>\r\n    <p>Message</p>\r\n  </div>\r\n</li>");
+})(ui, "<li class=\"ui-notification ui-hide\">\n  <div class=\"ui-content\">\n    <h1>Title</h1>\n    <a href=\"#\" class=\"ui-close\">×</a>\n    <p>Message</p>\n  </div>\n</li>");
 
 ;(function(exports, html){
 
@@ -1474,7 +1474,7 @@ SplitButton.prototype.render = function(options){
   return this;
 };
 
-})(ui, "<div class=\"ui-split-button\">\r\n  <a class=\"ui-text\" href=\"#\">Action</a>\r\n  <a class=\"ui-toggle\" href=\"#\"><span></span></a>\r\n</div>");
+})(ui, "<div class=\"ui-split-button\">\n  <a class=\"ui-text\" href=\"#\">Action</a>\n  <a class=\"ui-toggle\" href=\"#\"><span></span></a>\n</div>");
 
 ;(function(exports, html){
 
@@ -1716,7 +1716,7 @@ function slug(str) {
     .replace(/[^a-z0-9-]/g, '');
 }
 
-})(ui, "<div class=\"ui-menu\">\r\n</div>");
+})(ui, "<div class=\"ui-menu\">\n</div>");
 
 ;(function(exports, html){
 
@@ -1834,7 +1834,7 @@ Card.prototype.render = function(options){
     self.flip();
   });
 };
-})(ui, "<div class=\"ui-card\">\r\n  <div class=\"ui-wrapper\">\r\n    <div class=\"ui-face ui-front\">1</div>\r\n    <div class=\"ui-face ui-back\">2</div>\r\n  </div>\r\n</div>");
+})(ui, "<div class=\"ui-card\">\n  <div class=\"ui-wrapper\">\n    <div class=\"ui-face ui-front\">1</div>\n    <div class=\"ui-face ui-back\">2</div>\n  </div>\n</div>");
 
 ;(function(exports, html){
 /**
