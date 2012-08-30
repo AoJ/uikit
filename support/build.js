@@ -32,7 +32,7 @@ function next(i) {
 
 console.log();
 js.write('var ui = {};\n');
-js.write('if (module && module.exports) { module.exports = ui; }\n');
+js.write('if (typeof module == "object" && module.exports) { module.exports = ui; }\n');
 next(0);
 process.on('exit', function(){
   console.log();
@@ -51,9 +51,9 @@ function build(name, fn) {
     var html = path.join(lib, name, name + '.html');
     if (path.existsSync(html)) {
       read(html, function(html){
-        js = '\n;(function(exports, html){\n'
+        js = '\n;(function(exports, html, $){\n'
           + js
-          + '\n})(ui, ' + JSON.stringify(html) + ');';
+          + '\n})(ui, ' + JSON.stringify(html) + ', jQuery);';
         append('build/ui.js', js, function(){
           console.log('  \033[90mbuild \033[36m%s\033[m', name);
           fn();
@@ -61,9 +61,9 @@ function build(name, fn) {
       });
     // without template
     } else {
-      js = '\n;(function(exports){\n'
+      js = '\n;(function(exports, $){\n'
         + js
-        + '\n})(ui);';
+        + '\n})(ui, jQuery);';
       append('build/ui.js', js, function(){
         console.log('  \033[90mbuild \033[36m%s\033[m', name);
         fn();

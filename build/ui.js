@@ -1,5 +1,7 @@
 var ui = {};
-if (module && module.exports) { module.exports = ui; }
+if (window.module && module.exports) { module.exports = ui; }
+
+;(function($) {
 
 
 ;(function(exports){
@@ -2247,3 +2249,5 @@ Select.prototype.change = function(cb){
   return this;
 };
 })(ui, "");
+
+})(jQuery);
