@@ -1,10 +1,8 @@
 var ui = {};
-if (window.module && module.exports) { module.exports = ui; }
-
-;(function($) {
+if (typeof module == "object" && module.exports) { module.exports = ui; }
 
 
-;(function(exports){
+;(function(exports, $){
 /**
  * Expose `Emitter`.
  */
@@ -129,9 +127,9 @@ Emitter.prototype.emit = function(event){
 };
 
 
-})(ui);
+})(ui, jQuery);
 
-;(function(exports, html){
+;(function(exports, html, $){
 /**
  * Active dialog.
  */
@@ -397,9 +395,9 @@ Dialog.prototype.remove = function(){
   return this;
 };
 
-})(ui, "<div id=\"ui-dialog\" class=\"ui-dialog ui-hide\">\n  <div class=\"ui-content\">\n    <h1>Title</h1>\n    <a href=\"#\" class=\"ui-close\">×</a>\n    <p>Message</p>\n  </div>\n</div>");
+})(ui, "<div id=\"ui-dialog\" class=\"ui-dialog ui-hide\">\n  <div class=\"ui-content\">\n    <h1>Title</h1>\n    <a href=\"#\" class=\"ui-close\">×</a>\n    <p>Message</p>\n  </div>\n</div>", jQuery);
 
-;(function(exports, html){
+;(function(exports, html, $){
 /**
  * Expose `Overlay`.
  */
@@ -483,9 +481,9 @@ Overlay.prototype.hide = function(){
   return this;
 };
 
-})(ui, "<div id=\"ui-overlay\" class=\"ui-hide\"></div>");
+})(ui, "<div id=\"ui-overlay\" class=\"ui-hide\"></div>", jQuery);
 
-;(function(exports, html){
+;(function(exports, html, $){
 /**
  * Expose `Confirmation`.
  */
@@ -624,9 +622,9 @@ Confirmation.prototype.render = function(options){
   });
 };
 
-})(ui, "<div class=\"ui-actions\">\n  <button class=\"ui-cancel\">Cancel</button>\n  <button class=\"ui-ok ui-main\">Ok</button>\n</div>");
+})(ui, "<div class=\"ui-actions\">\n  <button class=\"ui-cancel\">Cancel</button>\n  <button class=\"ui-ok ui-main\">Ok</button>\n</div>", jQuery);
 
-;(function(exports, html){
+;(function(exports, html, $){
 
 /**
  * Expose `Alert`.
@@ -767,9 +765,9 @@ Alert.prototype.render = function(options){
 
 };
 
-})(ui, "<div class=\"ui-actions\">\n  <button class=\"ui-cancel ui-hide\">Cancel</button>\n  <button class=\"ui-ok ui-main ui-hide\">Ok</button>\n</div>");
+})(ui, "<div class=\"ui-actions\">\n  <button class=\"ui-cancel ui-hide\">Cancel</button>\n  <button class=\"ui-ok ui-main ui-hide\">Ok</button>\n</div>", jQuery);
 
-;(function(exports, html){
+;(function(exports, html, $){
 
 /**
  * Expose `ColorPicker`.
@@ -1121,9 +1119,9 @@ ColorPicker.prototype.renderMain = function(options){
   ctx.beginPath();
   ctx.restore();
 };
-})(ui, "<div class=\"ui-color-picker\">\n  <canvas class=\"ui-main\"></canvas>\n  <canvas class=\"ui-spectrum\"></canvas>\n</div>");
+})(ui, "<div class=\"ui-color-picker\">\n  <canvas class=\"ui-main\"></canvas>\n  <canvas class=\"ui-spectrum\"></canvas>\n</div>", jQuery);
 
-;(function(exports, html){
+;(function(exports, html, $){
 
 /**
  * Notification list.
@@ -1364,9 +1362,9 @@ Notification.prototype.remove = function(){
   this.el.remove();
   return this;
 };
-})(ui, "<li class=\"ui-notification ui-hide\">\n  <div class=\"ui-content\">\n    <h1>Title</h1>\n    <a href=\"#\" class=\"ui-close\">×</a>\n    <p>Message</p>\n  </div>\n</li>");
+})(ui, "<li class=\"ui-notification ui-hide\">\n  <div class=\"ui-content\">\n    <h1>Title</h1>\n    <a href=\"#\" class=\"ui-close\">×</a>\n    <p>Message</p>\n  </div>\n</li>", jQuery);
 
-;(function(exports, html){
+;(function(exports, html, $){
 
 /**
  * Expose `SplitButton`.
@@ -1476,9 +1474,9 @@ SplitButton.prototype.render = function(options){
   return this;
 };
 
-})(ui, "<div class=\"ui-split-button\">\n  <a class=\"ui-text\" href=\"#\">Action</a>\n  <a class=\"ui-toggle\" href=\"#\"><span></span></a>\n</div>");
+})(ui, "<div class=\"ui-split-button\">\n  <a class=\"ui-text\" href=\"#\">Action</a>\n  <a class=\"ui-toggle\" href=\"#\"><span></span></a>\n</div>", jQuery);
 
-;(function(exports, html){
+;(function(exports, html, $){
 
 /**
  * Expose `Menu`.
@@ -1718,9 +1716,9 @@ function slug(str) {
     .replace(/[^a-z0-9-]/g, '');
 }
 
-})(ui, "<div class=\"ui-menu\">\n</div>");
+})(ui, "<div class=\"ui-menu\">\n</div>", jQuery);
 
-;(function(exports, html){
+;(function(exports, html, $){
 
 /**
  * Expose `Card`.
@@ -1836,9 +1834,9 @@ Card.prototype.render = function(options){
     self.flip();
   });
 };
-})(ui, "<div class=\"ui-card\">\n  <div class=\"ui-wrapper\">\n    <div class=\"ui-face ui-front\">1</div>\n    <div class=\"ui-face ui-back\">2</div>\n  </div>\n</div>");
+})(ui, "<div class=\"ui-card\">\n  <div class=\"ui-wrapper\">\n    <div class=\"ui-face ui-front\">1</div>\n    <div class=\"ui-face ui-back\">2</div>\n  </div>\n</div>", jQuery);
 
-;(function(exports, html){
+;(function(exports, html, $){
 /**
  * Tabs.
  */
@@ -1964,9 +1962,9 @@ var getTabTarget = function(el) {
   return tabTarget;
 };
 
-})(ui, "");
+})(ui, "", jQuery);
 
-;(function(exports, html){
+;(function(exports, html, $){
 
 /**
  * Expose `InteractiveDialog`.
@@ -2127,9 +2125,9 @@ InteractiveDialog.prototype.render = function(options){
   }.bind(this));
 };
 
-})(ui, "");
+})(ui, "", jQuery);
 
-;(function(exports, html){
+;(function(exports, html, $){
 
 /**
  * Initialize a new `Select`
@@ -2248,6 +2246,4 @@ Select.prototype.change = function(cb){
   this.onChange = cb;
   return this;
 };
-})(ui, "");
-
-})(jQuery);
+})(ui, "", jQuery);
