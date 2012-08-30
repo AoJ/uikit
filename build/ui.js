@@ -484,147 +484,6 @@ Overlay.prototype.hide = function(){
 })(ui, "<div id=\"ui-overlay\" class=\"ui-hide\"></div>", jQuery);
 
 ;(function(exports, html, $){
-/**
- * Expose `Confirmation`.
- */
-
-exports.Confirmation = Confirmation;
-
-/**
- * Return a new `Confirmation` dialog with the given 
- * `title` and `msg`.
- *
- * @param {String} title or msg
- * @param {String} msg
- * @return {Dialog}
- * @api public
- */
-
-exports.confirm = function(title, msg){
-  switch (arguments.length) {
-    case 2:
-      return new Confirmation({ title: title, message: msg });
-    case 1:
-      return new Confirmation({ message: title });
-  }
-};
-
-/**
- * Initialize a new `Confirmation` dialog.
- *
- * Options:
- *
- *    - `title` dialog title
- *    - `message` a message to display
- *
- * Emits:
- *
- *    - `cancel` the user pressed cancel or closed the dialog
- *    - `ok` the user clicked ok
- *    - `show` when visible
- *    - `hide` when hidden
- *
- * @param {Object} options
- * @api public
- */
-
-function Confirmation(options) {
-  ui.Dialog.call(this, options);
-};
-
-/**
- * Inherit from `Dialog.prototype`.
- */
-
-Confirmation.prototype = new ui.Dialog;
-
-/**
- * Change "cancel" button `text`.
- *
- * @param {String} text
- * @return {Confirmation}
- * @api public
- */
-
-Confirmation.prototype.cancel = function(text){
-  this.el.find('.ui-cancel').text(text);
-  return this;
-};
-
-/**
- * Change "ok" button `text`.
- *
- * @param {String} text
- * @return {Confirmation}
- * @api public
- */
-
-Confirmation.prototype.ok = function(text){
-  this.el.find('.ui-ok').text(text);
-  return this;
-};
-
-/**
- * Show the confirmation dialog and invoke `fn(ok)`.
- *
- * @param {Function} fn
- * @return {Confirmation} for chaining
- * @api public
- */
-
-Confirmation.prototype.show = function(fn){
-  ui.Dialog.prototype.show.call(this);
-  this.el.find('.ui-ok').focus();
-  this.callback = fn || function(){};
-  return this;
-};
-
-/**
- * Render with the given `options`.
- *
- * Emits "cancel" event.
- * Emits "ok" event.
- *
- * @param {Object} options
- * @api public
- */
-
-Confirmation.prototype.render = function(options){
-  ui.Dialog.prototype.render.call(this, options);
-  var self = this
-    , actions = $(html);
-
-  this.el.addClass('ui-confirmation');
-  this.el.append(actions);
-
-  this.on('close', function(){
-    self.emit('cancel');
-    self.callback(false);
-  });
-
-  this.on('escape', function(){
-    self.emit('cancel');
-    self.callback(false);
-  });
-
-  actions.find('.ui-cancel').click(function(e){
-    e.preventDefault();
-    self.emit('cancel');
-    self.callback(false);
-    self.hide();
-  });
-
-  actions.find('.ui-ok').click(function(e){
-    e.preventDefault();
-    self.emit('ok');
-    self.callback(true);
-    self.hide();
-  });
-};
-
-})(ui, "<div class=\"ui-actions\">\n  <button class=\"ui-cancel\">Cancel</button>\n  <button class=\"ui-ok ui-main\">Ok</button>\n</div>", jQuery);
-
-;(function(exports, html, $){
 
 /**
  * Expose `Alert`.
@@ -768,358 +627,145 @@ Alert.prototype.render = function(options){
 })(ui, "<div class=\"ui-actions\">\n  <button class=\"ui-cancel ui-hide\">Cancel</button>\n  <button class=\"ui-ok ui-main ui-hide\">Ok</button>\n</div>", jQuery);
 
 ;(function(exports, html, $){
-
 /**
- * Expose `ColorPicker`.
+ * Expose `Confirmation`.
  */
 
-exports.ColorPicker = ColorPicker;
+exports.Confirmation = Confirmation;
 
 /**
- * RGB util.
+ * Return a new `Confirmation` dialog with the given 
+ * `title` and `msg`.
+ *
+ * @param {String} title or msg
+ * @param {String} msg
+ * @return {Dialog}
+ * @api public
  */
 
-function rgb(r,g,b) {
-  return 'rgb(' + r + ', ' + g + ', ' + b + ')';
-}
+exports.confirm = function(title, msg){
+  switch (arguments.length) {
+    case 2:
+      return new Confirmation({ title: title, message: msg });
+    case 1:
+      return new Confirmation({ message: title });
+  }
+};
 
 /**
- * RGBA util.
- */
-
-function rgba(r,g,b,a) {
-  return 'rgba(' + r + ', ' + g + ', ' + b + ', ' + a + ')';
-}
-
-/**
- * Mouse position util.
- */
-
-function localPos(e) {
-  var offset = $(e.target).offset();
-  return {
-      x: e.pageX - offset.left
-    , y: e.pageY - offset.top
-  };
-}
-
-/**
- * Initialize a new `ColorPicker`.
+ * Initialize a new `Confirmation` dialog.
+ *
+ * Options:
+ *
+ *    - `title` dialog title
+ *    - `message` a message to display
  *
  * Emits:
  *
- *    - `change` with the given color object
+ *    - `cancel` the user pressed cancel or closed the dialog
+ *    - `ok` the user clicked ok
+ *    - `show` when visible
+ *    - `hide` when hidden
  *
+ * @param {Object} options
  * @api public
  */
 
-function ColorPicker() {
-  ui.Emitter.call(this);
-  this._colorPos = {};
-  this.el = $(html);
-  this.main = this.el.find('.ui-main').get(0);
-  this.spectrum = this.el.find('.ui-spectrum').get(0);
-  $(this.main).bind('selectstart', function(e){ e.preventDefault() });
-  $(this.spectrum).bind('selectstart', function(e){ e.preventDefault() });
-  this.hue(rgb(255, 0, 0));
-  this.spectrumEvents();
-  this.mainEvents();
-  this.w = 180;
-  this.h = 180;
-  this.render();
-}
-
-/**
- * Inherit from `Emitter.prototype`.
- */
-
-ColorPicker.prototype = new ui.Emitter;
-
-/**
- * Set width / height to `n`.
- *
- * @param {Number} n
- * @return {ColorPicker} for chaining
- * @api public
- */
-
-ColorPicker.prototype.size = function(n){
-  return this
-    .width(n)
-    .height(n);
+function Confirmation(options) {
+  ui.Dialog.call(this, options);
 };
 
 /**
- * Set width to `n`.
+ * Inherit from `Dialog.prototype`.
+ */
+
+Confirmation.prototype = new ui.Dialog;
+
+/**
+ * Change "cancel" button `text`.
  *
- * @param {Number} n
- * @return {ColorPicker} for chaining
+ * @param {String} text
+ * @return {Confirmation}
  * @api public
  */
 
-ColorPicker.prototype.width = function(n){
-  this.w = n;
-  this.render();
+Confirmation.prototype.cancel = function(text){
+  this.el.find('.ui-cancel').text(text);
   return this;
 };
 
 /**
- * Set height to `n`.
+ * Change "ok" button `text`.
  *
- * @param {Number} n
- * @return {ColorPicker} for chaining
+ * @param {String} text
+ * @return {Confirmation}
  * @api public
  */
 
-ColorPicker.prototype.height = function(n){
-  this.h = n;
-  this.render();
+Confirmation.prototype.ok = function(text){
+  this.el.find('.ui-ok').text(text);
   return this;
 };
 
 /**
- * Spectrum related events.
+ * Show the confirmation dialog and invoke `fn(ok)`.
  *
- * @api private
- */
-
-ColorPicker.prototype.spectrumEvents = function(){
-  var self = this
-    , canvas = $(this.spectrum)
-    , down;
-
-  function update(e) {
-    var offsetY = localPos(e).y
-      , color = self.hueAt(offsetY - 4);
-    self.hue(color.toString());
-    self.emit('change', color);
-    self._huePos = offsetY;
-    self.render();
-  }
-
-  canvas.mousedown(function(e){
-    e.preventDefault();
-    down = true;
-    update(e);
-  });
-
-  canvas.mousemove(function(e){
-    if (down) update(e);
-  });
-
-  canvas.mouseup(function(){
-    down = false;
-  });
-};
-
-/**
- * Hue / lightness events.
- *
- * @api private
- */
-
-ColorPicker.prototype.mainEvents = function(){
-  var self = this
-    , canvas = $(this.main)
-    , down;
-
-  function update(e) {
-    var color;
-    self._colorPos = localPos(e);
-    color = self.colorAt(self._colorPos.x, self._colorPos.y);
-    self.color(color.toString());
-    self.emit('change', color);
-
-    self.render();
-  }
-
-  canvas.mousedown(function(e){
-    down = true;
-    update(e);
-  });
-
-  canvas.mousemove(function(e){
-    if (down) update(e);
-  });
-
-  canvas.mouseup(function(){
-    down = false;
-  });
-};
-
-/**
- * Get the RGB color at `(x, y)`.
- *
- * @param {Number} x
- * @param {Number} y
- * @return {Object}
- * @api private
- */
-
-ColorPicker.prototype.colorAt = function(x, y){
-  var data = this.main.getContext('2d').getImageData(x, y, 1, 1).data;
-  return {
-      r: data[0]
-    , g: data[1]
-    , b: data[2]
-    , toString: function(){
-      return rgb(this.r, this.g, this.b);
-    }
-  };
-};
-
-/**
- * Get the RGB value at `y`.
- *
- * @param {Type} name
- * @return {Type}
- * @api private
- */
-
-ColorPicker.prototype.hueAt = function(y){
-  var data = this.spectrum.getContext('2d').getImageData(0, y, 1, 1).data;
-  return {
-      r: data[0]
-    , g: data[1]
-    , b: data[2]
-    , toString: function(){
-      return rgb(this.r, this.g, this.b);
-    }
-  };
-};
-
-/**
- * Get or set `color`.
- *
- * @param {String} color
- * @return {String|ColorPicker}
+ * @param {Function} fn
+ * @return {Confirmation} for chaining
  * @api public
  */
 
-ColorPicker.prototype.color = function(color){
-  // TODO: update pos
-  if (0 == arguments.length) return this._color;
-  this._color = color;
-  return this;
-};
-
-/**
- * Get or set hue `color`.
- *
- * @param {String} color
- * @return {String|ColorPicker}
- * @api public
- */
-
-ColorPicker.prototype.hue = function(color){
-  // TODO: update pos
-  if (0 == arguments.length) return this._hue;
-  this._hue = color;
+Confirmation.prototype.show = function(fn){
+  ui.Dialog.prototype.show.call(this);
+  this.el.find('.ui-ok').focus();
+  this.callback = fn || function(){};
   return this;
 };
 
 /**
  * Render with the given `options`.
  *
+ * Emits "cancel" event.
+ * Emits "ok" event.
+ *
  * @param {Object} options
  * @api public
  */
 
-ColorPicker.prototype.render = function(options){
-  options = options || {};
-  this.renderMain(options);
-  this.renderSpectrum(options);
+Confirmation.prototype.render = function(options){
+  ui.Dialog.prototype.render.call(this, options);
+  var self = this
+    , actions = $(html);
+
+  this.el.addClass('ui-confirmation');
+  this.el.append(actions);
+
+  this.on('close', function(){
+    self.emit('cancel');
+    self.callback(false);
+  });
+
+  this.on('escape', function(){
+    self.emit('cancel');
+    self.callback(false);
+  });
+
+  actions.find('.ui-cancel').click(function(e){
+    e.preventDefault();
+    self.emit('cancel');
+    self.callback(false);
+    self.hide();
+  });
+
+  actions.find('.ui-ok').click(function(e){
+    e.preventDefault();
+    self.emit('ok');
+    self.callback(true);
+    self.hide();
+  });
 };
 
-/**
- * Render spectrum.
- *
- * @api private
- */
-
-ColorPicker.prototype.renderSpectrum = function(options){
-  var el = this.el
-    , canvas = this.spectrum
-    , ctx = canvas.getContext('2d')
-    , pos = this._huePos
-    , w = this.w * .12
-    , h = this.h;
-
-  canvas.width = w;
-  canvas.height = h;
-
-  var grad = ctx.createLinearGradient(0, 0, 0, h);
-  grad.addColorStop(0, rgb(255, 0, 0));
-  grad.addColorStop(.15, rgb(255, 0, 255));
-  grad.addColorStop(.33, rgb(0, 0, 255));
-  grad.addColorStop(.49, rgb(0, 255, 255));
-  grad.addColorStop(.67, rgb(0, 255, 0));
-  grad.addColorStop(.84, rgb(255, 255, 0));
-  grad.addColorStop(1, rgb(255, 0, 0));
-
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, w, h);
-
-  // pos
-  if (!pos) return;
-  ctx.fillStyle = rgba(0,0,0, .3);
-  ctx.fillRect(0, pos, w, 1);
-  ctx.fillStyle = rgba(255,255,255, .3);
-  ctx.fillRect(0, pos + 1, w, 1);
-};
-
-/**
- * Render hue/luminosity canvas.
- *
- * @api private
- */
-
-ColorPicker.prototype.renderMain = function(options){
-  var el = this.el
-    , canvas = this.main
-    , ctx = canvas.getContext('2d')
-    , w = this.w
-    , h = this.h
-    , x = (this._colorPos.x || w) + .5
-    , y = (this._colorPos.y || 0) + .5;
-
-  canvas.width = w;
-  canvas.height = h;
-
-  var grad = ctx.createLinearGradient(0, 0, w, 0);
-  grad.addColorStop(0, rgb(255, 255, 255));
-  grad.addColorStop(1, this._hue);
-
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, w, h);
-
-  grad = ctx.createLinearGradient(0, 0, 0, h);
-  grad.addColorStop(0, rgba(255, 255, 255, 0));
-  grad.addColorStop(1, rgba(0, 0, 0, 1));
-
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, w, h);
-
-  // pos
-  var rad = 10;
-  ctx.save();
-  ctx.beginPath();
-  ctx.lineWidth = 1;
-
-  // outer dark
-  ctx.strokeStyle = rgba(0,0,0,.5);
-  ctx.arc(x, y, rad / 2, 0, Math.PI * 2, false);
-  ctx.stroke();
-
-  // outer light
-  ctx.strokeStyle = rgba(255,255,255,.5);
-  ctx.arc(x, y, rad / 2 - 1, 0, Math.PI * 2, false);
-  ctx.stroke();
-
-  ctx.beginPath();
-  ctx.restore();
-};
-})(ui, "<div class=\"ui-color-picker\">\n  <canvas class=\"ui-main\"></canvas>\n  <canvas class=\"ui-spectrum\"></canvas>\n</div>", jQuery);
+})(ui, "<div class=\"ui-actions\">\n  <button class=\"ui-cancel\">Cancel</button>\n  <button class=\"ui-ok ui-main\">Ok</button>\n</div>", jQuery);
 
 ;(function(exports, html, $){
 
@@ -1363,118 +1009,6 @@ Notification.prototype.remove = function(){
   return this;
 };
 })(ui, "<li class=\"ui-notification ui-hide\">\n  <div class=\"ui-content\">\n    <h1>Title</h1>\n    <a href=\"#\" class=\"ui-close\">×</a>\n    <p>Message</p>\n  </div>\n</li>", jQuery);
-
-;(function(exports, html, $){
-
-/**
- * Expose `SplitButton`.
- */
-
-exports.SplitButton = SplitButton;
-
-/**
- * Initialize a new `SplitButton`
- * with an optional `label`.
- *
- * @param {String} label
- * @api public
- */
-
-function SplitButton(label) {
-  ui.Emitter.call(this);
-  this.el = $(html);
-  this.events();
-  this.render({ label: label });
-  this.state = 'hidden';
-}
-
-/**
- * Inherit from `Emitter.prototype`.
- */
-
-SplitButton.prototype = new ui.Emitter;
-
-/**
- * Register event handlers.
- *
- * @api private
- */
-
-SplitButton.prototype.events = function(){
-  var self = this
-    , el = this.el;
-
-  el.find('.ui-button').click(function(e){
-    e.preventDefault();
-    self.emit('click', e);
-  });
-
-  el.find('.ui-toggle').click(function(e){
-    e.preventDefault();
-    self.toggle();
-  });
-};
-
-/**
- * Toggle the drop-down contents.
- *
- * @return {SplitButton}
- * @api public
- */
-
-SplitButton.prototype.toggle = function(){
-  return 'hidden' == this.state
-    ? this.show()
-    : this.hide();
-};
-
-/**
- * Show the drop-down contents.
- *
- * @return {SplitButton}
- * @api public
- */
-
-SplitButton.prototype.show = function(){
-  this.state = 'visible';
-  this.emit('show');
-  this.el.addClass('ui-show');
-  return this;
-};
-
-/**
- * Hide the drop-down contents.
- *
- * @return {SplitButton}
- * @api public
- */
-
-SplitButton.prototype.hide = function(){
-  this.state = 'hidden';
-  this.emit('hide');
-  this.el.removeClass('ui-show');
-  return this;
-};
-
-/**
- * Render the split-button with the given `options`.
- *
- * @param {Object} options
- * @return {SplitButton}
- * @api private
- */
-
-SplitButton.prototype.render = function(options){
-  var options = options || {}
-    , button = this.el.find('.ui-button')
-    , label = options.label;
-
-  if ('string' == label) button.text(label);
-  else button.text('').append(label);
-  return this;
-};
-
-})(ui, "<div class=\"ui-split-button\">\n  <a class=\"ui-text\" href=\"#\">Action</a>\n  <a class=\"ui-toggle\" href=\"#\"><span></span></a>\n</div>", jQuery);
 
 ;(function(exports, html, $){
 
@@ -2247,3 +1781,212 @@ Select.prototype.change = function(cb){
   return this;
 };
 })(ui, "", jQuery);
+
+;(function(exports, html, $){
+/**
+ * Expose `KoNotes`.
+ */
+
+exports.KoNotes = KoNotes;
+
+/**
+ *
+ * @param {object} note
+ * @param {boolean} editable
+ */
+var Note = function (note) {
+	var note = note || {};
+	this.note_id = note.note_id;
+	this.author = note.author;
+	this.date = note.date;
+	this.content = note.content;
+	this.editable = !!note.editable;
+};
+
+/**
+ * Return a new `Alert` dialog with the given
+ * `title` and `msg`.
+ *
+ * @param {String} title or msg
+ * @param {String} msg
+ * @return {Dialog}
+ * @api public
+ */
+
+exports.koNotes = function (title, msg) {
+	switch (arguments.length) {
+		case 2:
+			return new KoNotes({ title: title, message: msg });
+		case 1:
+			return new KoNotes({ message: title });
+	}
+};
+
+/**
+ * Initialize a new `KoNotes` dialog.
+ *
+ * Options:
+ *
+ *    - `title` dialog title
+ *    - `message` a message to display
+ *
+ * Emits:
+ *
+ *    - `cancel` the user pressed cancel or closed the dialog
+ *    - `ok` the user clicked ok
+ *    - `show` when visible
+ *    - `hide` when hidden
+ *
+ * @param {Object} options
+ * @api public
+ */
+
+function KoNotes(options) {
+	this.notes = ko.observableArray([]);
+	ui.Dialog.call(this, options);
+}
+
+/**
+ * Inherit from `Dialog.prototype`.
+ */
+
+KoNotes.prototype = new ui.Dialog();
+
+/**
+ *
+ * @return {Function}
+ * @api public
+ */
+
+KoNotes.prototype.createViewModel = function (notes) {
+
+	this.notes = notes;
+	this.active = ko.observable(this.notes()[0] || new Note({}));
+
+	var self = this;
+	this.select = function (note) {
+		self.active(note);
+	};
+	this.selectDefault = function () {
+		self.active(self.notes()[0]);
+	};
+	this.getActiveClass = function (note) {
+		return self.active() === note ? 'ui-rev ui-active' : 'ui-rev';
+	};
+};
+
+
+/**
+ *
+ * @param {string} noteId
+ * @param {string} content
+ * @param {string} author
+ * @param {string} date
+ * @param {boolean} editable
+ * @return {KoNotes}
+ * @api public
+ */
+KoNotes.prototype.addNote = function (noteId, content, author, date, editable) {
+
+	this.notes.push(new Note({
+		note_id:  noteId,
+		author:   author,
+		date:     date,
+		content:  content,
+		editable: editable
+	}));
+	return this;
+};
+
+/**
+ * Change "cancel" button `text`.
+ *
+ * @param {String} text
+ * @return {KoNotes}
+ * @api public
+ */
+
+KoNotes.prototype.cancel = function (text) {
+	var cancel = this.el.find('.ui-cancel');
+	cancel.text(text);
+	cancel.removeClass('ui-hide');
+	return this;
+};
+
+/**
+ * Change "ok" button `text`.
+ *
+ * @param {String} text
+ * @return {KoNotes}
+ * @api public
+ */
+
+KoNotes.prototype.ok = function (text) {
+	var ok = this.el.find('.ui-ok');
+	ok.text(text);
+	ok.removeClass('ui-hide');
+	return this;
+};
+
+/**
+ * Show the confirmation dialog and invoke `fn(ok)`.
+ *
+ * @param {Function} fn
+ * @return {KoNotes} for chaining
+ * @api public
+ */
+
+KoNotes.prototype.show = function (fn) {
+	ui.Dialog.prototype.show.call(this);
+	this.el.find('.ui-ok').focus();
+	this.callback = fn || function () {};
+	return this;
+};
+
+/**
+ * Render with the given `options`.
+ *
+ * Emits "cancel" event.
+ * Emits "ok" event.
+ *
+ * @param {Object} options
+ * @api public
+ */
+
+KoNotes.prototype.render = function (options) {
+	ui.Dialog.prototype.render.call(this, options);
+	var self = this
+			, actions = $(html);
+
+	this.el.addClass('ui-alert');
+	this.el.append(actions);
+
+	this.viewModel = new self.createViewModel(this.notes);
+	ko.applyBindings(this.viewModel, this.el[0]);
+
+	this.on('show', function() {
+		self.viewModel.selectDefault();
+	});
+
+	this.on('close', function () {
+		self.emit('cancel');
+		self.callback(false);
+		self.hide();
+	});
+
+	actions.find('.cancel').click(function (e) {
+		e.preventDefault();
+		self.emit('cancel');
+		self.callback(false);
+		self.hide();
+	});
+
+	actions.find('.ok').click(function (e) {
+		e.preventDefault();
+		self.emit('ok');
+		self.callback(true);
+		self.hide();
+	});
+
+};
+})(ui, "<div class=\"ui-container\">\n\t<div class=\"ui-content\">\n\t\t<div data-bind=\"visible: !active().editable\" class=\"ui-info ui-top\"><a data-bind=\"click: selectDefault \">\n\t\t\tPokračovat v psaní poznámky</a></div>\n\t\t<textarea data-bind=\"value: active().content, visible: active().editable\"></textarea>\n\n\t\t<div class=\"ui-history-preview\" data-bind=\"text: active().content, visible: !active().editable\"></div>\n\t\t<div class=\"ui-info\">\n\t\t\t<i data-bind=\"text: active().author\"></i>\n\t\t</div>\n\n\t</div>\n\t<div class=\"ui-revisions\">\n\t\t<h3>Historie</h3>\n\t\t<ul data-bind=\"foreach: notes\">\n\t\t\t<li class=\"ui-rev\" data-bind=\"click: $root.select, attr: {class: $root.getActiveClass($data)}\"><span\n\t\t\t\t\tdata-bind=\"text: $data.date\"></span><br><span data-bind=\"text: $data.author\"></span></li>\n\t\t</ul>\n\t</div>\n\t​\n\t<div class=\"ui-actions\">\n\t  <button class=\"ui-cancel ui-hide\">Cancel</button>\n\t  <button class=\"ui-ok ui-main ui-hide\">Ok</button>\n\t</div>\n</div>", jQuery);

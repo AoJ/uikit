@@ -1,2 +1,2 @@
 
-module.exports = require('./lib/uikit');
+module.exports = require('./support/build.js');

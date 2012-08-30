@@ -2,11 +2,12 @@
   position: fixed;
   left: 50%;
   top: 150px;
-  max-width: 600px;
+  max-width: 800px;
   min-width: 250px;
   border: 1px solid #eee;
   background: white;
   z-index: 1000;
+	color: black;
 }
 
 .dialog .actions {

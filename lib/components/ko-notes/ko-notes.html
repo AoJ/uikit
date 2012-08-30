@@ -1,0 +1,25 @@
+<div class="ui-container">
+	<div class="ui-content">
+		<div data-bind="visible: !active().editable" class="ui-info ui-top"><a data-bind="click: selectDefault ">
+			Pokračovat v psaní poznámky</a></div>
+		<textarea data-bind="value: active().content, visible: active().editable"></textarea>
+
+		<div class="ui-history-preview" data-bind="text: active().content, visible: !active().editable"></div>
+		<div class="ui-info">
+			<i data-bind="text: active().author"></i>
+		</div>
+
+	</div>
+	<div class="ui-revisions">
+		<h3>Historie</h3>
+		<ul data-bind="foreach: notes">
+			<li class="ui-rev" data-bind="click: $root.select, attr: {class: $root.getActiveClass($data)}"><span
+					data-bind="text: $data.date"></span><br><span data-bind="text: $data.author"></span></li>
+		</ul>
+	</div>
+	​
+	<div class="ui-actions">
+	  <button class="ui-cancel ui-hide">Cancel</button>
+	  <button class="ui-ok ui-main ui-hide">Ok</button>
+	</div>
+</div>
